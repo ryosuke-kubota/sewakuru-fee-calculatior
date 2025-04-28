@@ -1,0 +1,248 @@
+'use client';
+
+import { useFormContext } from 'react-hook-form';
+import { Accordion } from '@/components/ui/Accordion';
+import { useFormStore } from '@/store/useFormStore';
+import { formatCurrency } from '@/utils/feeCalculator';
+
+export function TaxableOptionsSection() {
+  const { register, formState: { errors } } = useFormContext();
+  
+  const {
+    multiPet,
+    extension,
+    keyHandling,
+    taxableOptions,
+    plans,
+    setMultiPet,
+    setExtension,
+    setKeyHandling,
+    addTaxableOption,
+    updateTaxableOption,
+    removeTaxableOption,
+  } = useFormStore();
+
+  // プランの合計回数を計算
+  const totalPlanCount = plans.reduce((sum, plan) => sum + plan.count, 0);
+
+  // 多頭オプションの合計金額を計算（1頭あたり1000円）
+  const multiPetTotal = multiPet.additionalPets * totalPlanCount * 1000;
+
+  // 15分延長オプションの合計金額を計算（1回あたり600円）
+  const extensionTotal = extension.count * 600;
+
+  // 鍵の受取・返却オプションの合計金額を計算（1回あたり1000円）
+  const keyHandlingTotal = keyHandling.count * 1000;
+
+  return (
+    <Accordion title="オプション（課税）" defaultOpen={true}>
+      <div className="space-y-4">
+        {/* 多頭オプション */}
+        <div className="p-4 border rounded-md bg-gray-50">
+          <h3 className="text-sm font-medium mb-3">多頭オプション</h3>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="multiPet" className="block text-sm font-medium text-gray-700 mb-1">
+                追加頭数（1〜3頭）
+              </label>
+              <input
+                id="multiPet"
+                type="number"
+                min="0"
+                max="3"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register('multiPet', { 
+                  min: { value: 0, message: '0以上で入力してください' },
+                  max: { value: 3, message: '最大3頭までです' },
+                  valueAsNumber: true,
+                  onChange: (e) => setMultiPet(parseInt(e.target.value) || 0)
+                })}
+                defaultValue={multiPet.additionalPets}
+              />
+              {errors.multiPet && (
+                <p className="mt-1 text-sm text-red-600">{errors.multiPet.message as string}</p>
+              )}
+            </div>
+            {multiPet.additionalPets > 0 && (
+              <div className="text-right text-sm font-medium">
+                小計: {formatCurrency(multiPetTotal)} (税抜)
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 15分延長オプション */}
+        <div className="p-4 border rounded-md bg-gray-50">
+          <h3 className="text-sm font-medium mb-3">15分延長オプション（1回あたり600円）</h3>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="extension" className="block text-sm font-medium text-gray-700 mb-1">
+                回数
+              </label>
+              <input
+                id="extension"
+                type="number"
+                min="0"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register('extension', { 
+                  min: { value: 0, message: '0以上で入力してください' },
+                  valueAsNumber: true,
+                  onChange: (e) => setExtension(parseInt(e.target.value) || 0)
+                })}
+                defaultValue={extension.count}
+              />
+              {errors.extension && (
+                <p className="mt-1 text-sm text-red-600">{errors.extension.message as string}</p>
+              )}
+            </div>
+            {extension.count > 0 && (
+              <div className="text-right text-sm font-medium">
+                小計: {formatCurrency(extensionTotal)} (税抜)
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 鍵の受取・返却オプション */}
+        <div className="p-4 border rounded-md bg-gray-50">
+          <h3 className="text-sm font-medium mb-3">鍵の受取・返却（直接）（1回あたり1,000円）</h3>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="keyHandling" className="block text-sm font-medium text-gray-700 mb-1">
+                回数
+              </label>
+              <input
+                id="keyHandling"
+                type="number"
+                min="0"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register('keyHandling', { 
+                  min: { value: 0, message: '0以上で入力してください' },
+                  valueAsNumber: true,
+                  onChange: (e) => setKeyHandling(parseInt(e.target.value) || 0)
+                })}
+                defaultValue={keyHandling.count}
+              />
+              {errors.keyHandling && (
+                <p className="mt-1 text-sm text-red-600">{errors.keyHandling.message as string}</p>
+              )}
+            </div>
+            {keyHandling.count > 0 && (
+              <div className="text-right text-sm font-medium">
+                小計: {formatCurrency(keyHandlingTotal)} (税抜)
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* その他課税オプション（動的追加） */}
+        {taxableOptions.map((option, index) => (
+          <div key={option.id} className="p-4 border rounded-md bg-gray-50">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-sm font-medium">その他オプション {index + 1}</h3>
+              <button
+                type="button"
+                className="text-red-500 hover:text-red-700"
+                onClick={() => removeTaxableOption(option.id)}
+              >
+                削除
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {/* オプション名 */}
+              <div>
+                <label htmlFor={`option-name-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  オプション名 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id={`option-name-${option.id}`}
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...register(`taxableOptions.${index}.name`, { 
+                    required: 'オプション名は必須です',
+                    onChange: (e) => updateTaxableOption(option.id, { name: e.target.value })
+                  })}
+                  defaultValue={option.name}
+                />
+                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
+                {errors.taxableOptions?.[index]?.name && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {(errors.taxableOptions as Record<number, { name?: { message?: string } }>)[index]?.name?.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 回数 */}
+              <div>
+                <label htmlFor={`option-count-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  回数 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id={`option-count-${option.id}`}
+                  type="number"
+                  min="1"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...register(`taxableOptions.${index}.count`, { 
+                    required: '回数は必須です',
+                    min: { value: 1, message: '回数は1以上で入力してください' },
+                    valueAsNumber: true,
+                    onChange: (e) => updateTaxableOption(option.id, { count: parseInt(e.target.value) || 1 })
+                  })}
+                  defaultValue={option.count}
+                />
+                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
+                {errors.taxableOptions?.[index]?.count && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {(errors.taxableOptions as Record<number, { count?: { message?: string } }>)[index]?.count?.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 単価 */}
+              <div>
+                <label htmlFor={`option-price-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  単価（税抜） <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id={`option-price-${option.id}`}
+                  type="number"
+                  min="0"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...register(`taxableOptions.${index}.unitPrice`, { 
+                    required: '単価は必須です',
+                    min: { value: 0, message: '単価は0以上で入力してください' },
+                    valueAsNumber: true,
+                    onChange: (e) => updateTaxableOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
+                  })}
+                  defaultValue={option.unitPrice}
+                />
+                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
+                {errors.taxableOptions?.[index]?.unitPrice && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {(errors.taxableOptions as Record<number, { unitPrice?: { message?: string } }>)[index]?.unitPrice?.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 小計表示 */}
+              {option.name && option.count > 0 && option.unitPrice > 0 && (
+                <div className="text-right text-sm font-medium">
+                  小計: {formatCurrency(option.unitPrice * option.count)} (税抜)
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          className="w-full py-2 px-4 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          onClick={addTaxableOption}
+        >
+          + その他オプションを追加
+        </button>
+      </div>
+    </Accordion>
+  );
+}

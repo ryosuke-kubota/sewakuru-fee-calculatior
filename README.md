@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# シッティング見積フォーム
 
-## Getting Started
+犬・小動物シッティングの概算見積をスマホ中心で素早く作成し、その結果を1画面に収めたスクショとして共有できるWebフォームです。
 
-First, run the development server:
+## 機能
+
+- 顧客情報とサービス内容を入力し、料金を自動計算
+- 課税 / 非課税 / 税込合計を1画面に表示
+- スクリーンショットとしてエクスポート可能
+- モバイルファーストUI（375-430px幅想定）
+- セワクル / 東急のアライアンス切り替え機能
+
+## 技術スタック
+
+- **Next.js** 13+ (TypeScript, App Router)
+- **React‑Hook‑Form** + **Zod** でバリデーション
+- **Tailwind CSS** でモバイルファーストUI
+- **Day.js** で日付・時間処理
+- **clsx** で動的クラス結合
+- **Zustand** で状態管理
+
+## 開発環境のセットアップ
 
 ```bash
+# 依存関係のインストール
+npm install
+
+# 開発サーバーの起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) をブラウザで開いて結果を確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 使用方法
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. 基本情報（お客様名、担当シッター名、シッティング日時など）を入力
+2. プランを選択し、回数を設定
+3. 必要に応じてオプション（課税・非課税）を追加
+4. 「計算する」ボタンを押して料金を計算
+5. 結果画面をスクリーンショットとして保存するか、テキストとしてコピー
 
-## Learn More
+## ビルド方法
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# プロダクションビルドの作成
+npm run build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# ビルドの実行
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 料金計算ロジック
 
-## Deploy on Vercel
+- 小計(税抜) = Σ(課税項目)
+- 割増: 適用プランおよび延長に (1+20%)^n 適用 (n=選択数)
+- 消費税 = Math.floor(小計 * 10%)
+- 非課税合計 = Σ(非課税項目)
+- キャンセル係数を (小計+非課税) に最後に掛ける
+- 合計 = 小計 + 消費税 + 非課税 (すべて切り捨て後に加算)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ライセンス
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+このプロジェクトは社内利用を目的としています。
