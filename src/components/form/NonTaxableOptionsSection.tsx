@@ -47,7 +47,7 @@ function NonTaxableOptionInput({
                 fieldErrors?.[index]?.unitPrice ? 'border-red-500' : ''
               }`}
               {...register(`nonTaxableOptions.${index}.unitPrice`, {
-                required: '単価は必須です',
+                required: option.count > 0 ? '単価は必須です' : false,
                 min: { value: 0, message: '単価は0以上で入力してください' },
                 valueAsNumber: true,
                 onChange: (e) => updateOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
@@ -70,7 +70,7 @@ function NonTaxableOptionInput({
                 fieldErrors?.[index]?.count ? 'border-red-500' : ''
               }`}
               {...register(`nonTaxableOptions.${index}.count`, {
-                required: '回数は必須です',
+                required: option.unitPrice > 0 ? '回数は必須です' : false,
                 min: { value: 0, message: '回数は0以上で入力してください' },
                 valueAsNumber: true,
                 onChange: (e) => updateOption(option.id, { count: parseInt(e.target.value) || 0 })
@@ -213,7 +213,7 @@ export function NonTaxableOptionsSection() {
                   min="0"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...register(`nonTaxableOptions.${option.id}.unitPrice`, {
-                    required: '単価は必須です',
+                    required: option.count > 0 ? '単価は必須です' : false,
                     min: { value: 0, message: '単価は0以上で入力してください' },
                     valueAsNumber: true,
                     onChange: (e) => updateNonTaxableOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
@@ -239,7 +239,7 @@ export function NonTaxableOptionsSection() {
                   min="1"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...register(`nonTaxableOptions.${option.id}.count`, {
-                    required: '回数は必須です',
+                    required: option.unitPrice > 0 ? '回数は必須です' : false,
                     min: { value: 1, message: '回数は1以上で入力してください' },
                     valueAsNumber: true,
                     onChange: (e) => updateNonTaxableOption(option.id, { count: parseInt(e.target.value) || 1 })

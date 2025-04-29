@@ -179,14 +179,14 @@ const getInitialState = (): FormState => ({
   taxableOptions: [],
 
   transportationFee: {
-    count: 1, // 初期状態でも表示されるように1に設定
+    count: 0, // バリデーションエラーを防ぐために0に設定
     unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
   },
   nonTaxableOptions: [
     {
       id: 'nontaxable-transportation', // 出張費も非課税オプションとして扱う
       name: '出張費',
-      count: 1, // 初期状態でも表示されるように1に設定
+      count: 0, // バリデーションエラーを防ぐために0に設定
       unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
     },
     {
