@@ -45,7 +45,7 @@ export function TaxableOptionsSection() {
   const keyHandlingFeeText = formatCurrency(keyHandlingFee);
 
   return (
-    <Accordion title="オプション（課税）" defaultOpen={true}>
+    <Accordion title="課税オプション" defaultOpen={true}>
       <div className="space-y-4">
         {/* 多頭オプション */}
         <div className="p-4 border rounded-md bg-gray-50">

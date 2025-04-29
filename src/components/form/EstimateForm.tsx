@@ -22,7 +22,7 @@ const formSchema = z.object({
   feeSelection: z.enum(['旧料金', '新料金']),
   alliance: z.enum(['セワクル', '東急']),
   counseling: z.enum(['無料', '有料']),
-  surcharges: z.array(z.enum(['シーズン割増', '時間外割増'])),
+  surcharges: z.array(z.enum(['シーズン', '時間外'])),
   plans: z.array(
     z.object({
       name: z.string().min(1, 'プラン名は必須です'),

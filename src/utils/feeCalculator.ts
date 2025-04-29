@@ -2,7 +2,7 @@ import { FeeType } from '@/store/useFormStore';
 
 // 定数
 export const TAX_RATE = 0.10;
-export const SURCHARGE_RATE = 0.20; // 割増率（シーズン割増・時間外割増）
+export const SURCHARGE_RATE = 0.20; // 割増率（シーズン・時間外）
 
 // キャンセル係数
 export const CANCEL_FACTOR: Record<FeeType, number> = {
@@ -32,7 +32,12 @@ export const NEW_FEE_PLANS = {
 };
 
 // カウンセリング料金
-export const COUNSELING_FEE = 5000; // 有料カウンセリングの場合
+export const COUNSELING_FEE = 1000; // 有料カウンセリングの場合
+export const COUNSELING_TRANSPORTATION_FEE = 455; // カウンセリング交通費
+
+// 出張費
+export const SEWAKURU_TRANSPORTATION_FEE = 800; // セワクル出張費
+export const TOKYU_TRANSPORTATION_FEE = 1000; // 東急出張費
 
 // 多頭料金（1頭あたり）
 export const OLD_ADDITIONAL_PET_FEE = 800;

@@ -7,7 +7,11 @@ import {
   OLD_ADDITIONAL_PET_FEE,
   NEW_ADDITIONAL_PET_FEE,
   OLD_KEY_HANDLING_FEE,
-  NEW_KEY_HANDLING_FEE
+  NEW_KEY_HANDLING_FEE,
+  COUNSELING_FEE,
+  COUNSELING_TRANSPORTATION_FEE,
+  SEWAKURU_TRANSPORTATION_FEE,
+  TOKYU_TRANSPORTATION_FEE
 } from '@/utils/feeCalculator';
 
 // 料金タイプの定義
@@ -23,7 +27,7 @@ export type Alliance = 'セワクル' | '東急';
 export type Counseling = '無料' | '有料';
 
 // 割増の定義
-export type Surcharge = '時間外割増' | 'シーズン割増';
+export type Surcharge = '時間外' | 'シーズン';
 
 // プランの定義
 export interface Plan {
@@ -183,15 +187,21 @@ const getInitialState = (): FormState => ({
   taxableOptions: [],
 
   transportationFee: {
-    count: 0,
-    unitPrice: 546,
+    count: 1, // 初期状態でも表示されるように1に設定
+    unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
   },
   nonTaxableOptions: [
     {
       id: 'nontaxable-transportation', // 出張費も非課税オプションとして扱う
       name: '出張費',
-      count: 0,
-      unitPrice: 546,
+      count: 1, // 初期状態でも表示されるように1に設定
+      unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
+    },
+    {
+      id: 'nontaxable-counseling-transportation',
+      name: 'カウンセリング交通費',
+      count: 1, // 初期状態でも表示されるように1に設定
+      unitPrice: COUNSELING_TRANSPORTATION_FEE,
     },
     {
       id: 'nontaxable-parking',
@@ -228,8 +238,47 @@ export const useFormStore = create<FormState & FormActions>()(
       setSittingDateTime: (dateTime) => set({ sittingDateTime: dateTime }),
       setFeeType: (type) => set({ feeType: type }),
       setFeeSelection: (selection) => set({ feeSelection: selection }),
-      setAlliance: (alliance) => set({ alliance: alliance }),
-      setCounseling: (counseling) => set({ counseling: counseling }),
+      setAlliance: (alliance) => {
+        // アライアンスに基づいて出張費を設定
+        const transportationFeeUnitPrice = alliance === 'セワクル' ? SEWAKURU_TRANSPORTATION_FEE : TOKYU_TRANSPORTATION_FEE;
+        
+        // 現在の状態を取得
+        const currentState = get();
+        
+        // 出張費の非課税オプションを更新
+        const updatedNonTaxableOptions = currentState.nonTaxableOptions.map(option =>
+          option.id === 'nontaxable-transportation'
+            ? { ...option, unitPrice: transportationFeeUnitPrice }
+            : option
+        );
+        
+        // 状態を更新
+        set({
+          alliance: alliance,
+          transportationFee: {
+            ...currentState.transportationFee,
+            unitPrice: transportationFeeUnitPrice
+          },
+          nonTaxableOptions: updatedNonTaxableOptions
+        });
+      },
+      setCounseling: (counseling) => {
+        // 現在の状態を取得
+        const currentState = get();
+        
+        // カウンセリング交通費の非課税オプションを更新
+        const updatedNonTaxableOptions = currentState.nonTaxableOptions.map(option =>
+          option.id === 'nontaxable-counseling-transportation'
+            ? { ...option, count: counseling === '無料' ? 1 : 1 } // 無料でも有料でも1回
+            : option
+        );
+        
+        // 状態を更新
+        set({
+          counseling: counseling,
+          nonTaxableOptions: updatedNonTaxableOptions
+        });
+      },
       toggleSurcharge: (surcharge) => {
         const currentSurcharges = get().surcharges;
         const exists = currentSurcharges.includes(surcharge);
@@ -405,8 +454,8 @@ export const useFormStore = create<FormState & FormActions>()(
         
         // カウンセリング料金（有料の場合）
         if (state.counseling === '有料') {
-          // カウンセリング料金を追加（仮に5000円とする）
-          subtotalTaxExcluded += 5000;
+          // カウンセリング料金を追加
+          subtotalTaxExcluded += COUNSELING_FEE;
         }
         
         // 多頭料金の計算

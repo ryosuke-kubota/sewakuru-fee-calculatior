@@ -166,19 +166,19 @@ export function PlanSection() {
                     <input
                       type="checkbox"
                       className="form-checkbox h-4 w-4 text-blue-600"
-                      checked={isSurchargeSelected(plan, '時間外割増')}
-                      onChange={() => handleToggleSurcharge(plan.id, '時間外割増')}
+                      checked={isSurchargeSelected(plan, '時間外')}
+                      onChange={() => handleToggleSurcharge(plan.id, '時間外')}
                     />
-                    <span className="ml-1 text-sm">時間外割増 (+20%)</span>
+                    <span className="ml-1 text-sm">時間外 (+20%)</span>
                   </label>
                   <label className="inline-flex items-center ml-4">
                     <input
                       type="checkbox"
                       className="form-checkbox h-4 w-4 text-blue-600"
-                      checked={isSurchargeSelected(plan, 'シーズン割増')}
-                      onChange={() => handleToggleSurcharge(plan.id, 'シーズン割増')}
+                      checked={isSurchargeSelected(plan, 'シーズン')}
+                      onChange={() => handleToggleSurcharge(plan.id, 'シーズン')}
                     />
-                    <span className="ml-1 text-sm">シーズン割増 (+20%)</span>
+                    <span className="ml-1 text-sm">シーズン (+20%)</span>
                   </label>
                 </div>
               </div>

@@ -14,6 +14,8 @@ export function ResultSection() {
     customerName,
     sitterName,
     sittingDateTime,
+    feeType,
+    feeSelection,
     alliance,
     plans,
     multiPet,
@@ -32,42 +34,6 @@ export function ResultSection() {
   const colorClasses = alliance === 'セワクル' 
     ? { primary: 'bg-sewakuru-primary', light: 'bg-sewakuru-light', text: 'text-sewakuru-primary' }
     : { primary: 'bg-tokyu-primary', light: 'bg-tokyu-light', text: 'text-tokyu-primary' };
-
-  // 結果をテキストとしてコピーする関数
-  const copyResultAsText = () => {
-    if (!calculationResult) return;
-
-    const resultText = `
-実施日: ${formattedDate}
-お客様名: ${customerName} 様
-シッター名: ${sitterName}
-──────── 合計 ${formatCurrency(calculationResult.grandTotal)} ──────────
-
-■課税明細
-${plans.map(plan => `  ${plan.name} × ${plan.count}回  ${formatCurrency(plan.unitPrice * plan.count)} (税抜)`).join('\n')}
-${multiPet.additionalPets > 0 ? `  多頭オプション(${multiPet.additionalPets}頭)  ${formatCurrency(multiPet.additionalPets * 1000)} (税抜)\n` : ''}
-${extension.count > 0 ? `  15分延長 × ${extension.count}回  ${formatCurrency(extension.count * 600)} (税抜)\n` : ''}
-${keyHandling.count > 0 ? `  鍵の受取・返却 × ${keyHandling.count}回  ${formatCurrency(keyHandling.count * 1000)} (税抜)\n` : ''}
-${taxableOptions.map(option => `  ${option.name} × ${option.count}回  ${formatCurrency(option.unitPrice * option.count)} (税抜)`).join('\n')}
-  小計(税抜)  ${formatCurrency(calculationResult.subtotalTaxExcluded)}
-  消費税     ${formatCurrency(calculationResult.tax)}
-  小計(税込)  ${formatCurrency(calculationResult.subtotalTaxIncluded)}
-
-■非課税明細
-${transportationFee.count > 0 ? `  出張費 × ${transportationFee.count}回  ${formatCurrency(transportationFee.count * 546)}\n` : ''}
-${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${formatCurrency(option.unitPrice * option.count)}`).join('\n')}
-  非課税合計  ${formatCurrency(calculationResult.nonTaxableTotal)}
-`.trim();
-
-    navigator.clipboard.writeText(resultText)
-      .then(() => {
-        alert('結果をクリップボードにコピーしました');
-      })
-      .catch(err => {
-        console.error('コピーに失敗しました:', err);
-        alert('コピーに失敗しました');
-      });
-  };
 
   // 結果をスクリーンショットとして保存する関数
   const saveResultAsImage = () => {
@@ -129,31 +95,41 @@ ${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${for
               ご利用金額 {formatCurrency(calculationResult.grandTotal)}
             </div>
 
-            {/* 課税明細 */}
             <div className="p-3 border-b">
-              <h3 className={`font-bold ${colorClasses.text} mb-2`}>■課税明細</h3>
+              <div className='flex gap-1'>
+                <div className='text-xs border rounded-full px-4 py-1'>{feeType}</div>
+                <div className='text-xs border rounded-full px-4 py-1'>{feeSelection}</div>
+                <div className='text-xs border rounded-full px-4 py-1'>{alliance}</div>
+              </div>
+            </div>
+
+            {/* カウンセリング */}
+            <div className="p-3 border-b">
+              <h3 className={`font-bold ${colorClasses.text} mb-2`}>■カウンセリング</h3>
+              <div className="space-y-1 pl-2"></div>
+            </div>
+
+            {/* シッティング */}
+            <div className="p-3 border-b">
+              <h3 className={`font-bold ${colorClasses.text} mb-2`}>■シッティング</h3>
               <div className="space-y-1 pl-2">
                 {/* プラン */}
                 {plans.map((plan) => (
-                  <div key={plan.id} className="flex justify-between text-sm">
-                    <span>{plan.name} × {plan.count}回</span>
-                    <span>{formatCurrency(plan.unitPrice * plan.count)} (税抜)</span>
+                  <div key={plan.id} className="flex justify-between items-center text-sm">
+                    <span>{plan.name} × {plan.count}回 {plan.surcharges.length > 0 && `(${plan.surcharges})`}</span>
+                    <span>{formatCurrency(plan.unitPrice * plan.count)}</span>
                   </div>
                 ))}
+
+                {multiPet.additionalPets > 0 || keyHandling.count > 0 || taxableOptions.length > 0 ? (
+                  <div className='border border-dashed my-3'></div>
+                ):(<></>)}
 
                 {/* 多頭オプション */}
                 {multiPet.additionalPets > 0 && (
                   <div className="flex justify-between text-sm">
                     <span>多頭オプション({multiPet.additionalPets}頭)</span>
-                    <span>{formatCurrency(multiPet.additionalPets * 1000)} (税抜)</span>
-                  </div>
-                )}
-
-                {/* 15分延長 */}
-                {extension.count > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span>15分延長 × {extension.count}回</span>
-                    <span>{formatCurrency(extension.count * 600)} (税抜)</span>
+                    <span>{formatCurrency(multiPet.additionalPets * 1000)}</span>
                   </div>
                 )}
 
@@ -161,7 +137,7 @@ ${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${for
                 {keyHandling.count > 0 && (
                   <div className="flex justify-between text-sm">
                     <span>鍵の受取・返却 × {keyHandling.count}回</span>
-                    <span>{formatCurrency(keyHandling.count * 1000)} (税抜)</span>
+                    <span>{formatCurrency(keyHandling.count * 1000)}</span>
                   </div>
                 )}
 
@@ -169,12 +145,12 @@ ${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${for
                 {taxableOptions.map((option) => (
                   <div key={option.id} className="flex justify-between text-sm">
                     <span>{option.name} × {option.count}回</span>
-                    <span>{formatCurrency(option.unitPrice * option.count)} (税抜)</span>
+                    <span>{formatCurrency(option.unitPrice * option.count)}</span>
                   </div>
                 ))}
 
                 {/* 小計（税抜） */}
-                <div className="flex justify-between font-medium pt-1 border-t">
+                <div className="flex justify-between font-medium pt-1 mt-6 border-t">
                   <span>小計(税抜)</span>
                   <span>{formatCurrency(calculationResult.subtotalTaxExcluded)}</span>
                 </div>
@@ -201,7 +177,15 @@ ${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${for
                 {transportationFee.count > 0 && (
                   <div className="flex justify-between text-sm">
                     <span>出張費 × {transportationFee.count}回</span>
-                    <span>{formatCurrency(transportationFee.count * 546)}</span>
+                    <span>{formatCurrency(transportationFee.count * transportationFee.unitPrice)}</span>
+                  </div>
+                )}
+
+                {/* カウンセリング交通費 */}
+                {nonTaxableOptions.find(o => o.id === 'nontaxable-counseling-transportation' && o.count > 0) && (
+                  <div className="flex justify-between text-sm">
+                    <span>カウンセリング交通費</span>
+                    <span>{formatCurrency(nonTaxableOptions.find(o => o.id === 'nontaxable-counseling-transportation')?.unitPrice || 0)}</span>
                   </div>
                 )}
 
@@ -222,6 +206,11 @@ ${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${for
                 )}
               </div>
             </div>
+            {/* メッセージ */}
+            <div className='p-3'>
+              <p className='text-xs'>ご利用いただきありがとうございます。<br />
+              ご不明な点がございましたら、担当のシッターまでお気軽にお問い合わせください。</p>
+            </div>
           </div>
 
           {/* アクションボタン */}
@@ -229,13 +218,6 @@ ${nonTaxableOptions.map(option => `  ${option.name} × ${option.count}回  ${for
             <button
               type="button"
               className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              onClick={copyResultAsText}
-            >
-              テキストとしてコピー
-            </button>
-            <button
-              type="button"
-              className="flex-1 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               onClick={saveResultAsImage}
             >
               画像として保存
