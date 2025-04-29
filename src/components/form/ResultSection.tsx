@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { Accordion } from '@/components/ui/Accordion';
 import { useFormStore } from '@/store/useFormStore';
-import { formatCurrency } from '@/utils/feeCalculator';
+import { formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
 import html2canvas from 'html2canvas';
 
@@ -17,18 +17,24 @@ export function ResultSection() {
     feeType,
     feeSelection,
     alliance,
+    counseling,
     plans,
     multiPet,
-    extension,
     keyHandling,
     taxableOptions,
-    transportationFee,
     nonTaxableOptions,
     calculationResult,
   } = useFormStore();
 
   // 日付フォーマット
   const formattedDate = dayjs(sittingDateTime).format('YYYY/MM/DD HH:mm');
+
+  // トータルプラン数
+  const totalPlanCount = plans.reduce((sum, plan) => {
+    // 15分延長プランは除外
+    if (plan.name === '15分延長') return sum;
+    return sum + plan.count;
+  }, 0)
 
   // アライアンスに応じたカラークラスを設定
   const colorClasses = alliance === 'セワクル' 
@@ -106,7 +112,13 @@ export function ResultSection() {
             {/* カウンセリング */}
             <div className="p-3 border-b">
               <h3 className={`font-bold ${colorClasses.text} mb-2`}>■カウンセリング</h3>
-              <div className="space-y-1 pl-2"></div>
+              <div className="space-y-1 pl-2">
+                {/* カウンセリング料金 */}
+                <div className="flex justify-between text-sm">
+                  <span>{counseling}カウンセリング × 1回</span>
+                  <span>{formatCurrency(counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE)}</span>
+                </div>
+              </div>
             </div>
 
             {/* シッティング */}
@@ -128,8 +140,16 @@ export function ResultSection() {
                 {/* 多頭オプション */}
                 {multiPet.additionalPets > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span>多頭オプション({multiPet.additionalPets}頭)</span>
-                    <span>{formatCurrency(multiPet.additionalPets * 1000)}</span>
+                    <span>多頭料金 × {multiPet.additionalPets}頭 × {totalPlanCount}回</span>
+                    <span>
+                      {formatCurrency(
+                        multiPet.additionalPets *
+                        // 15分延長以外のプランの合計数を計算
+                        totalPlanCount *
+                        // 料金選択に基づいて単価を決定（旧料金: 800円、新料金: 800円）
+                        (feeSelection === '旧料金' ? 800 : 800)
+                      )}
+                    </span>
                   </div>
                 )}
 
@@ -169,32 +189,19 @@ export function ResultSection() {
               </div>
             </div>
 
-            {/* 非課税明細 */}
+            {/* 諸経費 */}
             <div className="p-3">
-              <h3 className={`font-bold ${colorClasses.text} mb-2`}>■非課税明細</h3>
+              <h3 className={`font-bold ${colorClasses.text} mb-2`}>■諸経費</h3>
               <div className="space-y-1 pl-2">
-                {/* 出張費 */}
-                {transportationFee.count > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span>出張費 × {transportationFee.count}回</span>
-                    <span>{formatCurrency(transportationFee.count * transportationFee.unitPrice)}</span>
-                  </div>
-                )}
-
-                {/* カウンセリング交通費 */}
-                {nonTaxableOptions.find(o => o.id === 'nontaxable-counseling-transportation' && o.count > 0) && (
-                  <div className="flex justify-between text-sm">
-                    <span>カウンセリング交通費</span>
-                    <span>{formatCurrency(nonTaxableOptions.find(o => o.id === 'nontaxable-counseling-transportation')?.unitPrice || 0)}</span>
-                  </div>
-                )}
 
                 {/* その他非課税オプション */}
                 {nonTaxableOptions.map((option) => (
-                  <div key={option.id} className="flex justify-between text-sm">
-                    <span>{option.name} × {option.count}回</span>
-                    <span>{formatCurrency(option.unitPrice * option.count)}</span>
-                  </div>
+                  (option.name && option.count > 0) && (
+                    <div key={option.id} className="flex justify-between text-sm">
+                      <span>{option.name} × {option.count}回</span>
+                      <span>{formatCurrency(option.unitPrice * option.count)}</span>
+                    </div>
+                  )
                 ))}
 
                 {/* 非課税合計 */}

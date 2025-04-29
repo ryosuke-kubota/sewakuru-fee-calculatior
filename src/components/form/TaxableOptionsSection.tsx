@@ -27,8 +27,12 @@ export function TaxableOptionsSection() {
     removeTaxableOption,
   } = useFormStore();
 
-  // プランの合計回数を計算
-  const totalPlanCount = plans.reduce((sum, plan) => sum + plan.count, 0);
+  // 15分延長以外のプランの合計回数を計算
+  const totalPlanCount = plans.reduce((sum, plan) => {
+    // 15分延長プランは除外
+    if (plan.name === '15分延長') return sum;
+    return sum + plan.count;
+  }, 0);
 
   // 料金選択に基づいて単価を決定
   const additionalPetFee = feeSelection === '旧料金' ? OLD_ADDITIONAL_PET_FEE : NEW_ADDITIONAL_PET_FEE;

@@ -8,8 +8,8 @@ import {
   NEW_ADDITIONAL_PET_FEE,
   OLD_KEY_HANDLING_FEE,
   NEW_KEY_HANDLING_FEE,
-  COUNSELING_FEE,
-  COUNSELING_TRANSPORTATION_FEE,
+  FREE_COUNSELING_FEE,
+  PAID_COUNSELING_FEE,
   SEWAKURU_TRANSPORTATION_FEE,
   TOKYU_TRANSPORTATION_FEE
 } from '@/utils/feeCalculator';
@@ -165,15 +165,7 @@ const getInitialState = (): FormState => ({
   counseling: '無料',
   surcharges: [],
 
-  plans: [
-    {
-      id: '1', // 固定IDを使用
-      name: '犬の基本プラン',
-      count: 1,
-      unitPrice: 4000, // 旧料金の犬の基本プランの単価
-      surcharges: [],
-    },
-  ],
+  plans: [],
 
   multiPet: {
     additionalPets: 0,
@@ -196,12 +188,6 @@ const getInitialState = (): FormState => ({
       name: '出張費',
       count: 1, // 初期状態でも表示されるように1に設定
       unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
-    },
-    {
-      id: 'nontaxable-counseling-transportation',
-      name: 'カウンセリング交通費',
-      count: 1, // 初期状態でも表示されるように1に設定
-      unitPrice: COUNSELING_TRANSPORTATION_FEE,
     },
     {
       id: 'nontaxable-parking',
@@ -263,20 +249,9 @@ export const useFormStore = create<FormState & FormActions>()(
         });
       },
       setCounseling: (counseling) => {
-        // 現在の状態を取得
-        const currentState = get();
-        
-        // カウンセリング交通費の非課税オプションを更新
-        const updatedNonTaxableOptions = currentState.nonTaxableOptions.map(option =>
-          option.id === 'nontaxable-counseling-transportation'
-            ? { ...option, count: counseling === '無料' ? 1 : 1 } // 無料でも有料でも1回
-            : option
-        );
-        
         // 状態を更新
         set({
-          counseling: counseling,
-          nonTaxableOptions: updatedNonTaxableOptions
+          counseling: counseling
         });
       },
       toggleSurcharge: (surcharge) => {
@@ -318,7 +293,7 @@ export const useFormStore = create<FormState & FormActions>()(
       },
       removePlan: (id) => {
         const currentPlans = get().plans;
-        if (currentPlans.length <= 1) return; // 最低1つは必要
+        // if (currentPlans.length <= 1) return; // 最低1つは必要
         
         set({
           plans: currentPlans.filter(p => p.id !== id),
@@ -452,14 +427,17 @@ export const useFormStore = create<FormState & FormActions>()(
           return sum + planFee;
         }, 0);
         
-        // カウンセリング料金（有料の場合）
-        if (state.counseling === '有料') {
-          // カウンセリング料金を追加
-          subtotalTaxExcluded += COUNSELING_FEE;
-        }
+        // カウンセリング料金（無料または有料）
+        const counselingFee = state.counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE;
+        subtotalTaxExcluded += counselingFee;
         
         // 多頭料金の計算
-        const totalPlanCount = state.plans.reduce((sum, plan) => sum + plan.count, 0);
+        // 15分延長以外のプランの合計数を計算
+        const totalPlanCount = state.plans.reduce((sum, plan) => {
+          // 15分延長プランは除外
+          if (plan.name === '15分延長') return sum;
+          return sum + plan.count;
+        }, 0);
         // 料金選択に基づいて多頭料金を決定
         const additionalPetFee = state.feeSelection === '旧料金' ? OLD_ADDITIONAL_PET_FEE : NEW_ADDITIONAL_PET_FEE;
         const multiPetFee = state.multiPet.additionalPets * totalPlanCount * additionalPetFee;

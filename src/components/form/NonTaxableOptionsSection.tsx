@@ -8,7 +8,6 @@ import { useFormContext } from 'react-hook-form';
 // 固定非課税オプションの定義
 const FIXED_OPTIONS = [
   { id: 'nontaxable-transportation', name: '出張費', registerPrefix: 'transportationFee' },
-  { id: 'nontaxable-counseling-transportation', name: 'カウンセリング交通費', registerPrefix: 'counselingTransportation' },
   { id: 'nontaxable-parking', name: '駐車料金', registerPrefix: 'parking' },
   { id: 'nontaxable-public-transport', name: '公共交通機関', registerPrefix: 'publicTransport' },
   { id: 'nontaxable-key-shipping', name: '鍵郵送代', registerPrefix: 'keyShipping' },
@@ -62,7 +61,7 @@ function NonTaxableOptionInput({
         </div>
         {option.count > 0 && option.unitPrice > 0 && (
           <div className="text-right text-sm font-medium mt-3">
-            小計: {formatCurrency(option.unitPrice * option.count)} (非課税)
+            小計: {formatCurrency(option.unitPrice * option.count)}
           </div>
         )}
       </div>

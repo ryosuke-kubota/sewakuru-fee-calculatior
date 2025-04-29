@@ -93,7 +93,7 @@ export function PlanSection() {
           <div key={plan.id} className="p-4 border rounded-md bg-gray-50">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-medium">プラン {index + 1}</h3>
-              {plans.length > 1 && (
+              {plans.length > 0 && (
                 <button
                   type="button"
                   className="text-red-500 hover:text-red-700"

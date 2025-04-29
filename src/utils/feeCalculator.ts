@@ -32,7 +32,9 @@ export const NEW_FEE_PLANS = {
 };
 
 // カウンセリング料金
-export const COUNSELING_FEE = 1000; // 有料カウンセリングの場合
+export const FREE_COUNSELING_FEE = 1000; // 無料カウンセリングの場合
+export const PAID_COUNSELING_FEE = 2000; // 有料カウンセリングの場合
+export const COUNSELING_FEE = 1000; // 後方互換性のため残す
 export const COUNSELING_TRANSPORTATION_FEE = 455; // カウンセリング交通費
 
 // 出張費
