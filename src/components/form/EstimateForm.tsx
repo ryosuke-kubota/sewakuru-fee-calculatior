@@ -18,29 +18,29 @@ const formSchema = z.object({
   customerName: z.string().min(1, 'お客様名は必須です'),
   sitterName: z.string().min(1, '担当シッター名は必須です'),
   sittingDateTime: z.string().min(1, 'シッティング日時は必須です'),
-  feeType: z.enum(['通常', 'キャンセル50%', 'キャンセル100%']).default('通常'),
-  feeSelection: z.enum(['旧料金', '新料金']).default('旧料金'),
-  alliance: z.enum(['セワクル', '東急']).default('セワクル'),
-  counseling: z.enum(['無料', '有料']).default('無料'),
-  surcharges: z.array(z.enum(['シーズン', '時間外'])).default([]),
+  feeType: z.enum(['通常', 'キャンセル50%', 'キャンセル100%']),
+  feeSelection: z.enum(['旧料金', '新料金']),
+  alliance: z.enum(['セワクル', '東急']),
+  counseling: z.enum(['無料', '有料']),
+  surcharges: z.array(z.enum(['シーズン', '時間外'])),
   plans: z.array(
     z.object({
       id: z.string(),
       name: z.string().min(1, 'プラン名は必須です'),
       count: z.number().min(1, '回数は1以上で入力してください'),
       unitPrice: z.number().min(0, '単価は0以上で入力してください'),
-      surcharges: z.array(z.enum(['シーズン', '時間外'])).default([]),
+      surcharges: z.array(z.enum(['シーズン', '時間外'])),
     })
-  ).default([]),
+  ),
   multiPet: z.object({
     additionalPets: z.number().min(0, '0以上で入力してください').max(3, '最大3頭までです')
-  }).default({ additionalPets: 0 }),
+  }),
   extension: z.object({
     count: z.number().min(0, '0以上で入力してください')
-  }).default({ count: 0 }),
+  }),
   keyHandling: z.object({
     count: z.number().min(0, '0以上で入力してください')
-  }).default({ count: 0 }),
+  }),
   taxableOptions: z.array(
     z.object({
       id: z.string(),
@@ -48,18 +48,56 @@ const formSchema = z.object({
       count: z.number().min(1, '回数は1以上で入力してください'),
       unitPrice: z.number().min(0, '単価は0以上で入力してください'),
     })
-  ).default([]),
+  ),
   nonTaxableOptions: z.array(
     z.object({
       id: z.string(),
-      name: z.string().optional().or(z.string().min(1, 'オプション名は必須です')),
+      name: z.string().min(1, 'オプション名は必須です'),
       count: z.number().min(0, '回数は0以上で入力してください'),
       unitPrice: z.number().min(0, '単価は0以上で入力してください'),
     })
-  ).default([]),
+  ),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+// 必須フィールドを明示的に指定した型
+type FormValues = {
+  customerName: string;
+  sitterName: string;
+  sittingDateTime: string;
+  feeType: '通常' | 'キャンセル50%' | 'キャンセル100%';
+  feeSelection: '旧料金' | '新料金';
+  alliance: 'セワクル' | '東急';
+  counseling: '無料' | '有料';
+  surcharges: ('シーズン' | '時間外')[];
+  plans: {
+    id: string;
+    name: string;
+    count: number;
+    unitPrice: number;
+    surcharges: ('シーズン' | '時間外')[];
+  }[];
+  multiPet: {
+    additionalPets: number;
+  };
+  extension: {
+    count: number;
+  };
+  keyHandling: {
+    count: number;
+  };
+  taxableOptions: {
+    id: string;
+    name: string;
+    count: number;
+    unitPrice: number;
+  }[];
+  nonTaxableOptions: {
+    id: string;
+    name: string;
+    count: number;
+    unitPrice: number;
+  }[];
+};
 
 // 固定非課税オプションの定義（NonTaxableOptionsSectionと同じ定義）
 const FIXED_OPTIONS = [
@@ -84,6 +122,20 @@ export function EstimateForm() {
     mode: 'onChange',
   });
   
+  // コンポーネントマウント時に初期値を設定
+  useEffect(() => {
+    // 初期値を設定
+    methods.setValue('feeType', '通常');
+    methods.setValue('feeSelection', '旧料金');
+    methods.setValue('alliance', 'セワクル');
+    methods.setValue('counseling', '無料');
+    methods.setValue('surcharges', []);
+    methods.setValue('multiPet', { additionalPets: 0 });
+    methods.setValue('extension', { count: 0 });
+    methods.setValue('keyHandling', { count: 0 });
+    methods.setValue('taxableOptions', []);
+  }, [methods]);
+
   // フォームの状態が変更されたときに値を設定
   useEffect(() => {
     // フォームの値を設定
