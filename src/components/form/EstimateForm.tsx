@@ -52,7 +52,7 @@ const formSchema = z.object({
   nonTaxableOptions: z.array(
     z.object({
       id: z.string(),
-      name: z.string().min(1, 'オプション名は必須です'),
+      name: z.string().optional().or(z.string().min(1, 'オプション名は必須です')),
       count: z.number().min(0, '回数は0以上で入力してください'),
       unitPrice: z.number().min(0, '単価は0以上で入力してください'),
     })
@@ -84,14 +84,16 @@ export function EstimateForm() {
     mode: 'onChange',
   });
   
-  // フォームの状態が変更されたときにバリデーションを実行
+  // フォームの状態が変更されたときに値を設定
   useEffect(() => {
     // フォームの値を設定
     methods.setValue('plans', plans);
     methods.setValue('nonTaxableOptions', nonTaxableOptions);
     
-    // バリデーションを実行（エラーメッセージを表示するため）
-    methods.trigger();
+    // フォームが送信された後のみバリデーションを実行
+    if (methods.formState.isSubmitted) {
+      methods.trigger();
+    }
   }, [methods, plans, nonTaxableOptions]);
 
   // フォーム送信処理
