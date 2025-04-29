@@ -18,6 +18,7 @@ export const OLD_FEE_PLANS = {
   '犬の散歩プラン': 3200,
   '猫の基本プラン': 3600,
   '小動物の基本プラン': 3600,
+  '15分延長': 600,
 };
 
 // 基本料金プラン（新料金 - 2025年7月〜）
@@ -27,19 +28,22 @@ export const NEW_FEE_PLANS = {
   '犬の散歩プラン': 4100,
   '猫の基本プラン': 4600,
   '小動物の基本プラン': 4600,
+  '15分延長': 600,
 };
 
 // カウンセリング料金
 export const COUNSELING_FEE = 5000; // 有料カウンセリングの場合
 
 // 多頭料金（1頭あたり）
-export const ADDITIONAL_PET_FEE = 1000;
+export const OLD_ADDITIONAL_PET_FEE = 800;
+export const NEW_ADDITIONAL_PET_FEE = 800;
 
 // 15分延長料金
 export const EXTENSION_FEE = 600;
 
 // 鍵の受取・返却料金
-export const KEY_HANDLING_FEE = 1000;
+export const OLD_KEY_HANDLING_FEE = 1000;
+export const NEW_KEY_HANDLING_FEE = 1000;
 
 
 /**

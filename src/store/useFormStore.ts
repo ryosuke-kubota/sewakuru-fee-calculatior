@@ -3,6 +3,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import dayjs from 'dayjs';
+import {
+  OLD_ADDITIONAL_PET_FEE,
+  NEW_ADDITIONAL_PET_FEE,
+  OLD_KEY_HANDLING_FEE,
+  NEW_KEY_HANDLING_FEE
+} from '@/utils/feeCalculator';
 
 // 料金タイプの定義
 export type FeeType = '通常' | 'キャンセル50%' | 'キャンセル100%';
@@ -405,15 +411,31 @@ export const useFormStore = create<FormState & FormActions>()(
         
         // 多頭料金の計算
         const totalPlanCount = state.plans.reduce((sum, plan) => sum + plan.count, 0);
-        const multiPetFee = state.multiPet.additionalPets * totalPlanCount * 1000; // 仮に1頭あたり1000円とする
+        // 料金選択に基づいて多頭料金を決定
+        const additionalPetFee = state.feeSelection === '旧料金' ? OLD_ADDITIONAL_PET_FEE : NEW_ADDITIONAL_PET_FEE;
+        const multiPetFee = state.multiPet.additionalPets * totalPlanCount * additionalPetFee;
         subtotalTaxExcluded += multiPetFee;
         
-        // 15分延長料金の計算
-        const extensionFee = state.extension.count * 600;
+        // 15分延長料金の計算 - プランの割増を適用
+        let extensionFee = state.extension.count * 600;
+        
+        // 最初のプランの割増を15分延長オプションにも適用
+        if (state.plans.length > 0 && state.plans[0].surcharges.length > 0) {
+          const firstPlan = state.plans[0];
+          const planSurchargeCount = firstPlan.surcharges.length;
+          if (planSurchargeCount > 0) {
+            // 割増率の計算: (1 + SURCHARGE_RATE)^n
+            const surchargeRate = Math.pow(1 + SURCHARGE_RATE, planSurchargeCount);
+            extensionFee = extensionFee * surchargeRate;
+          }
+        }
+        
         subtotalTaxExcluded += extensionFee;
         
         // 鍵の受取・返却料金の計算
-        const keyHandlingFee = state.keyHandling.count * 1000;
+        // 料金選択に基づいて鍵の受取・返却料金を決定
+        const keyHandlingUnitFee = state.feeSelection === '旧料金' ? OLD_KEY_HANDLING_FEE : NEW_KEY_HANDLING_FEE;
+        const keyHandlingFee = state.keyHandling.count * keyHandlingUnitFee;
         subtotalTaxExcluded += keyHandlingFee;
         
         // その他課税オプションの計算

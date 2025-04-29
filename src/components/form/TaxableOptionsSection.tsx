@@ -3,19 +3,24 @@
 import { useFormContext } from 'react-hook-form';
 import { Accordion } from '@/components/ui/Accordion';
 import { useFormStore } from '@/store/useFormStore';
-import { formatCurrency } from '@/utils/feeCalculator';
+import {
+  formatCurrency,
+  OLD_ADDITIONAL_PET_FEE,
+  NEW_ADDITIONAL_PET_FEE,
+  OLD_KEY_HANDLING_FEE,
+  NEW_KEY_HANDLING_FEE
+} from '@/utils/feeCalculator';
 
 export function TaxableOptionsSection() {
   const { register, formState: { errors } } = useFormContext();
   
   const {
     multiPet,
-    extension,
     keyHandling,
     taxableOptions,
     plans,
+    feeSelection,
     setMultiPet,
-    setExtension,
     setKeyHandling,
     addTaxableOption,
     updateTaxableOption,
@@ -25,21 +30,26 @@ export function TaxableOptionsSection() {
   // プランの合計回数を計算
   const totalPlanCount = plans.reduce((sum, plan) => sum + plan.count, 0);
 
-  // 多頭オプションの合計金額を計算（1頭あたり1000円）
-  const multiPetTotal = multiPet.additionalPets * totalPlanCount * 1000;
+  // 料金選択に基づいて単価を決定
+  const additionalPetFee = feeSelection === '旧料金' ? OLD_ADDITIONAL_PET_FEE : NEW_ADDITIONAL_PET_FEE;
+  const keyHandlingFee = feeSelection === '旧料金' ? OLD_KEY_HANDLING_FEE : NEW_KEY_HANDLING_FEE;
 
-  // 15分延長オプションの合計金額を計算（1回あたり600円）
-  const extensionTotal = extension.count * 600;
+  // 多頭オプションの合計金額を計算
+  const multiPetTotal = multiPet.additionalPets * totalPlanCount * additionalPetFee;
 
-  // 鍵の受取・返却オプションの合計金額を計算（1回あたり1000円）
-  const keyHandlingTotal = keyHandling.count * 1000;
+  // 鍵の受取・返却オプションの合計金額を計算
+  const keyHandlingTotal = keyHandling.count * keyHandlingFee;
+
+  // 表示用の料金テキスト
+  const additionalPetFeeText = formatCurrency(additionalPetFee);
+  const keyHandlingFeeText = formatCurrency(keyHandlingFee);
 
   return (
     <Accordion title="オプション（課税）" defaultOpen={true}>
       <div className="space-y-4">
         {/* 多頭オプション */}
         <div className="p-4 border rounded-md bg-gray-50">
-          <h3 className="text-sm font-medium mb-3">多頭オプション</h3>
+          <h3 className="text-sm font-medium mb-3">多頭オプション（1頭あたり{additionalPetFeeText}）</h3>
           <div className="space-y-3">
             <div>
               <label htmlFor="multiPet" className="block text-sm font-medium text-gray-700 mb-1">
@@ -71,41 +81,10 @@ export function TaxableOptionsSection() {
           </div>
         </div>
 
-        {/* 15分延長オプション */}
-        <div className="p-4 border rounded-md bg-gray-50">
-          <h3 className="text-sm font-medium mb-3">15分延長オプション（1回あたり600円）</h3>
-          <div className="space-y-3">
-            <div>
-              <label htmlFor="extension" className="block text-sm font-medium text-gray-700 mb-1">
-                回数
-              </label>
-              <input
-                id="extension"
-                type="number"
-                min="0"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register('extension', { 
-                  min: { value: 0, message: '0以上で入力してください' },
-                  valueAsNumber: true,
-                  onChange: (e) => setExtension(parseInt(e.target.value) || 0)
-                })}
-                defaultValue={extension.count}
-              />
-              {errors.extension && (
-                <p className="mt-1 text-sm text-red-600">{errors.extension.message as string}</p>
-              )}
-            </div>
-            {extension.count > 0 && (
-              <div className="text-right text-sm font-medium">
-                小計: {formatCurrency(extensionTotal)} (税抜)
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* 鍵の受取・返却オプション */}
         <div className="p-4 border rounded-md bg-gray-50">
-          <h3 className="text-sm font-medium mb-3">鍵の受取・返却（直接）（1回あたり1,000円）</h3>
+          <h3 className="text-sm font-medium mb-3">鍵の受取・返却（直接）（1回あたり{keyHandlingFeeText}）</h3>
           <div className="space-y-3">
             <div>
               <label htmlFor="keyHandling" className="block text-sm font-medium text-gray-700 mb-1">
