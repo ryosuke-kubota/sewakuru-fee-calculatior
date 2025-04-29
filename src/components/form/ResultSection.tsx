@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef } from 'react';
-import { Accordion } from '@/components/ui/Accordion';
 import { useFormStore } from '@/store/useFormStore';
 import { formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
