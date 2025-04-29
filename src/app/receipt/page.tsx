@@ -2,13 +2,13 @@
 
 import { formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, Suspense } from 'react';
 import html2canvas from 'html2canvas';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { FormState } from '@/store/useFormStore';
 
-export default function ReceiptPage() {
+function ReceiptContent() {
   const resultRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const [receiptData, setReceiptData] = useState<FormState | null>(null);
@@ -277,5 +277,19 @@ export default function ReceiptPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ReceiptPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 py-8 px-4 flex flex-col items-center justify-center">
+        <div className="text-center py-8 text-gray-500">
+          読み込み中...
+        </div>
+      </div>
+    }>
+      <ReceiptContent />
+    </Suspense>
   );
 }
