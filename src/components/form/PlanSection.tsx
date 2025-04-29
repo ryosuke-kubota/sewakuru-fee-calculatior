@@ -112,12 +112,15 @@ export function PlanSection() {
                 </label>
                 <select
                   id={`plan-name-${plan.id}`}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`plans.${index}.name`, { 
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.plans?.[index]?.name ? 'border-red-500' : ''
+                  }`}
+                  {...register(`plans.${index}.name`, {
                     required: 'プラン名は必須です',
                     onChange: (e) => handlePlanNameChange(plan.id, e.target.value)
                   })}
                   value={plan.name}
+                  aria-invalid={errors.plans?.[index]?.name ? "true" : "false"}
                 >
                   <option value="">プランを選択してください</option>
                   {planNames.map((name) => (
@@ -141,14 +144,17 @@ export function PlanSection() {
                   id={`plan-count-${plan.id}`}
                   type="number"
                   min="1"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`plans.${index}.count`, { 
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.plans?.[index]?.count ? 'border-red-500' : ''
+                  }`}
+                  {...register(`plans.${index}.count`, {
                     required: '回数は必須です',
                     min: { value: 1, message: '回数は1以上で入力してください' },
                     valueAsNumber: true,
                     onChange: (e) => updatePlan(plan.id, { count: parseInt(e.target.value) || 1 })
                   })}
                   defaultValue={plan.count}
+                  aria-invalid={errors.plans?.[index]?.count ? "true" : "false"}
                 />
                 {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
                 {errors.plans?.[index]?.count && (

@@ -372,6 +372,7 @@ export const useFormStore = create<FormState & FormActions>()(
       // 非課税オプション操作
       addNonTaxableOption: () => {
         const currentOptions = get().nonTaxableOptions;
+        console.log('ののん', currentOptions)
         set({
           nonTaxableOptions: [
             ...currentOptions,

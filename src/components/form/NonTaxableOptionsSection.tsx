@@ -18,11 +18,18 @@ function NonTaxableOptionInput({
   option,
   registerPrefix,
   updateOption,
+  index,
 }: {
   option: NonTaxableOption,
   registerPrefix: string,
   updateOption: (id: string, data: Partial<NonTaxableOption>) => void,
+  index: number,
 }) {
+  const { register, formState: { errors } } = useFormContext();
+  
+  // エラーオブジェクトの取得（型アサーションを使用）
+  const fieldErrors = errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string }, count?: { message?: string } }> | undefined;
+  
   return (
     <div className="p-4 border rounded-md bg-gray-50">
       <h3 className="text-sm font-medium mb-3">{option.name}</h3>
@@ -30,33 +37,49 @@ function NonTaxableOptionInput({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor={`${registerPrefix}UnitPrice`} className="block text-sm font-medium text-gray-700 mb-1">
-              単価
+              単価 <span className="text-red-500">*</span>
             </label>
             <input
               id={`${registerPrefix}UnitPrice`}
               type="number"
               min="0"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              value={option.unitPrice}
-              onChange={(e) => {
-                updateOption(option.id, { unitPrice: parseInt(e.target.value) || 0 });
-              }}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                fieldErrors?.[index]?.unitPrice ? 'border-red-500' : ''
+              }`}
+              {...register(`nonTaxableOptions.${index}.unitPrice`, {
+                required: '単価は必須です',
+                min: { value: 0, message: '単価は0以上で入力してください' },
+                valueAsNumber: true,
+                onChange: (e) => updateOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
+              })}
+              defaultValue={option.unitPrice}
             />
+            {fieldErrors?.[index]?.unitPrice && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors[index].unitPrice?.message}</p>
+            )}
           </div>
           <div>
             <label htmlFor={`${registerPrefix}Count`} className="block text-sm font-medium text-gray-700 mb-1">
-              回数
+              回数 <span className="text-red-500">*</span>
             </label>
             <input
               id={`${registerPrefix}Count`}
               type="number"
               min="0"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              value={option.count}
-              onChange={(e) => {
-                updateOption(option.id, { count: parseInt(e.target.value) || 0 });
-              }}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                fieldErrors?.[index]?.count ? 'border-red-500' : ''
+              }`}
+              {...register(`nonTaxableOptions.${index}.count`, {
+                required: '回数は必須です',
+                min: { value: 0, message: '回数は0以上で入力してください' },
+                valueAsNumber: true,
+                onChange: (e) => updateOption(option.id, { count: parseInt(e.target.value) || 0 })
+              })}
+              defaultValue={option.count}
             />
+            {fieldErrors?.[index]?.count && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors[index].count?.message}</p>
+            )}
           </div>
         </div>
         {option.count > 0 && option.unitPrice > 0 && (
@@ -128,12 +151,13 @@ export function NonTaxableOptionsSection() {
     <Accordion title="非課税オプション" defaultOpen={true}>
       <div className="space-y-4">
         {/* 固定非課税オプション */}
-        {FIXED_OPTIONS.map(option => (
+        {FIXED_OPTIONS.map((option, index) => (
           <NonTaxableOptionInput
             key={option.id}
             option={getFixedOption(option.id)}
             registerPrefix={option.registerPrefix}
             updateOption={getUpdateHandler(option.id)}
+            index={index}
           />
         ))}
 
@@ -164,16 +188,16 @@ export function NonTaxableOptionsSection() {
                   type="text"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="その他"
-                  {...register(`nonTaxableOptions.${index}.name`, {
+                  {...register(`nonTaxableOptions.${option.id}.name`, {
                     required: 'オプション名は必須です',
                     onChange: (e) => updateNonTaxableOption(option.id, { name: e.target.value })
                   })}
                   defaultValue={option.name}
                 />
                 {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.nonTaxableOptions?.[index]?.name && (
+                {errors.nonTaxableOptions?.[option.id]?.name && (
                   <p className="mt-1 text-sm text-red-600">
-                    {(errors.nonTaxableOptions as Record<number, { name?: { message?: string } }>)[index]?.name?.message}
+                    {(errors.nonTaxableOptions as Record<number, { name?: { message?: string } }>)[option.id]?.name?.message}
                   </p>
                 )}
               </div>
@@ -188,7 +212,7 @@ export function NonTaxableOptionsSection() {
                   type="number"
                   min="0"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`nonTaxableOptions.${index}.unitPrice`, {
+                  {...register(`nonTaxableOptions.${option.id}.unitPrice`, {
                     required: '単価は必須です',
                     min: { value: 0, message: '単価は0以上で入力してください' },
                     valueAsNumber: true,
@@ -197,9 +221,9 @@ export function NonTaxableOptionsSection() {
                   defaultValue={option.unitPrice}
                 />
                 {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.nonTaxableOptions?.[index]?.unitPrice && (
+                {errors.nonTaxableOptions?.[option.id]?.unitPrice && (
                   <p className="mt-1 text-sm text-red-600">
-                    {(errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }>)[index]?.unitPrice?.message}
+                    {(errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }>)[option.id]?.unitPrice?.message}
                   </p>
                 )}
               </div>
@@ -214,7 +238,7 @@ export function NonTaxableOptionsSection() {
                   type="number"
                   min="1"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`nonTaxableOptions.${index}.count`, {
+                  {...register(`nonTaxableOptions.${option.id}.count`, {
                     required: '回数は必須です',
                     min: { value: 1, message: '回数は1以上で入力してください' },
                     valueAsNumber: true,
@@ -223,9 +247,9 @@ export function NonTaxableOptionsSection() {
                   defaultValue={option.count}
                 />
                 {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.nonTaxableOptions?.[index]?.count && (
+                {errors.nonTaxableOptions?.[option.id]?.count && (
                   <p className="mt-1 text-sm text-red-600">
-                    {(errors.nonTaxableOptions as Record<number, { count?: { message?: string } }>)[index]?.count?.message}
+                    {(errors.nonTaxableOptions as Record<number, { count?: { message?: string } }>)[option.id]?.count?.message}
                   </p>
                 )}
               </div>

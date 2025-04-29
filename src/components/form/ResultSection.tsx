@@ -66,7 +66,7 @@ export function ResultSection() {
   };
 
   return (
-    <Accordion title="計算結果" defaultOpen={!!calculationResult}>
+    <>
       {calculationResult ? (
         <div className="space-y-4">
           {/* 結果表示エリア */}
@@ -257,6 +257,6 @@ export function ResultSection() {
           計算ボタンを押すと、ここに結果が表示されます。
         </div>
       )}
-    </Accordion>
+    </>
   );
 }

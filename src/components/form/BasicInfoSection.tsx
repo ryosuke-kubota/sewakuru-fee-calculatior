@@ -35,12 +35,15 @@ export function BasicInfoSection() {
           <input
             id="customerName"
             type="text"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.customerName ? 'border-red-500' : ''
+            }`}
             {...register('customerName', {
               required: 'お客様名は必須です',
               onChange: (e) => setCustomerName(e.target.value)
             })}
             defaultValue={customerName}
+            aria-invalid={errors.customerName ? "true" : "false"}
           />
           {errors.customerName && (
             <p className="mt-1 text-sm text-red-600">{errors.customerName.message as string}</p>
@@ -55,12 +58,15 @@ export function BasicInfoSection() {
           <input
             id="sitterName"
             type="text"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.sitterName ? 'border-red-500' : ''
+            }`}
             {...register('sitterName', {
               required: '担当シッター名は必須です',
               onChange: (e) => setSitterName(e.target.value)
             })}
             defaultValue={sitterName}
+            aria-invalid={errors.sitterName ? "true" : "false"}
           />
           {errors.sitterName && (
             <p className="mt-1 text-sm text-red-600">{errors.sitterName.message as string}</p>
@@ -75,7 +81,9 @@ export function BasicInfoSection() {
           <input
             id="sittingDateTime"
             type="datetime-local"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.sittingDateTime ? 'border-red-500' : ''
+            }`}
             {...register('sittingDateTime', {
               required: 'シッティング日時は必須です',
               onChange: (e) => {
@@ -85,6 +93,7 @@ export function BasicInfoSection() {
               }
             })}
             defaultValue={sittingDateTime.replace(/\//g, '-')}
+            aria-invalid={errors.sittingDateTime ? "true" : "false"}
           />
           {errors.sittingDateTime && (
             <p className="mt-1 text-sm text-red-600">{errors.sittingDateTime.message as string}</p>

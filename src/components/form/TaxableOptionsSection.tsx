@@ -14,6 +14,19 @@ import {
 export function TaxableOptionsSection() {
   const { register, formState: { errors } } = useFormContext();
   
+  // エラーオブジェクトの型定義
+  type MultiPetErrors = {
+    additionalPets?: {
+      message: string;
+    };
+  };
+  
+  type KeyHandlingErrors = {
+    count?: {
+      message: string;
+    };
+  };
+  
   const {
     multiPet,
     keyHandling,
@@ -64,17 +77,20 @@ export function TaxableOptionsSection() {
                 type="number"
                 min="0"
                 max="3"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register('multiPet', { 
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  (errors.multiPet as MultiPetErrors)?.additionalPets ? 'border-red-500' : ''
+                }`}
+                {...register('multiPet.additionalPets', {
                   min: { value: 0, message: '0以上で入力してください' },
                   max: { value: 3, message: '最大3頭までです' },
                   valueAsNumber: true,
                   onChange: (e) => setMultiPet(parseInt(e.target.value) || 0)
                 })}
                 defaultValue={multiPet.additionalPets}
+                aria-invalid={(errors.multiPet as MultiPetErrors)?.additionalPets ? "true" : "false"}
               />
-              {errors.multiPet && (
-                <p className="mt-1 text-sm text-red-600">{errors.multiPet.message as string}</p>
+              {(errors.multiPet as MultiPetErrors)?.additionalPets && (
+                <p className="mt-1 text-sm text-red-600">{(errors.multiPet as MultiPetErrors).additionalPets?.message}</p>
               )}
             </div>
             {multiPet.additionalPets > 0 && (
@@ -98,16 +114,19 @@ export function TaxableOptionsSection() {
                 id="keyHandling"
                 type="number"
                 min="0"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register('keyHandling', { 
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  (errors.keyHandling as KeyHandlingErrors)?.count ? 'border-red-500' : ''
+                }`}
+                {...register('keyHandling.count', {
                   min: { value: 0, message: '0以上で入力してください' },
                   valueAsNumber: true,
                   onChange: (e) => setKeyHandling(parseInt(e.target.value) || 0)
                 })}
                 defaultValue={keyHandling.count}
+                aria-invalid={(errors.keyHandling as KeyHandlingErrors)?.count ? "true" : "false"}
               />
-              {errors.keyHandling && (
-                <p className="mt-1 text-sm text-red-600">{errors.keyHandling.message as string}</p>
+              {(errors.keyHandling as KeyHandlingErrors)?.count && (
+                <p className="mt-1 text-sm text-red-600">{(errors.keyHandling as KeyHandlingErrors).count?.message}</p>
               )}
             </div>
             {keyHandling.count > 0 && (
