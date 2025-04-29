@@ -229,6 +229,27 @@ export function ResultSection() {
             >
               画像として保存
             </button>
+            <a
+              href={`/receipt?data=${encodeURIComponent(JSON.stringify({
+                customerName,
+                sitterName,
+                sittingDateTime,
+                feeType,
+                feeSelection,
+                alliance,
+                counseling,
+                plans,
+                multiPet,
+                keyHandling,
+                taxableOptions,
+                nonTaxableOptions,
+                calculationResult
+              }))}`}
+              target="_blank"
+              className="flex-1 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-center"
+            >
+              別ページで表示
+            </a>
           </div>
         </div>
       ) : (
