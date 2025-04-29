@@ -7,8 +7,15 @@ import { OLD_FEE_PLANS, NEW_FEE_PLANS } from '@/utils/feeCalculator';
 import { formatCurrency } from '@/utils/feeCalculator';
 import { useEffect } from 'react';
 
+type PlanFormData = {
+  plans: {
+    name?: string;
+    count?: number;
+  }[];
+};
+
 export function PlanSection() {
-  const { register, formState: { errors } } = useFormContext();
+  const { register, formState: { errors } } = useFormContext<PlanFormData>();
   
   const {
     plans,
@@ -129,7 +136,6 @@ export function PlanSection() {
                     </option>
                   ))}
                 </select>
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
                 {errors.plans?.[index]?.name && (
                   <p className="mt-1 text-sm text-red-600">{(errors.plans as Record<number, { name?: { message?: string } }>)[index]?.name?.message}</p>
                 )}
@@ -156,7 +162,6 @@ export function PlanSection() {
                   defaultValue={plan.count}
                   aria-invalid={errors.plans?.[index]?.count ? "true" : "false"}
                 />
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
                 {errors.plans?.[index]?.count && (
                   <p className="mt-1 text-sm text-red-600">{(errors.plans as Record<number, { count?: { message?: string } }>)[index]?.count?.message}</p>
                 )}
