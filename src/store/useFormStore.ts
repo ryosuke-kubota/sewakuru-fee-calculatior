@@ -286,9 +286,20 @@ export const useFormStore = create<FormState & FormActions>()(
       updatePlan: (id, plan) => {
         const currentPlans = get().plans;
         set({
-          plans: currentPlans.map(p => 
-            p.id === id ? { ...p, ...plan } : p
-          ),
+          plans: currentPlans.map(p => {
+            if (p.id === id) {
+              // 更新前に、surchargesが存在しない場合は空の配列を設定
+              const updatedPlan = { ...p, ...plan };
+              
+              // surchargesが未定義の場合は空の配列を設定
+              if (updatedPlan.surcharges === undefined) {
+                updatedPlan.surcharges = [];
+              }
+              
+              return updatedPlan;
+            }
+            return p;
+          }),
         });
       },
       removePlan: (id) => {
@@ -415,10 +426,14 @@ export const useFormStore = create<FormState & FormActions>()(
         
         // 基本料金（プラン）の計算 - 各プランごとに割増を適用
         let subtotalTaxExcluded = state.plans.reduce((sum, plan) => {
-          let planFee = plan.unitPrice * plan.count;
+          // unitPriceとcountが有効な値であることを確認
+          const unitPrice = plan.unitPrice || 0;
+          const count = plan.count || 0;
+          let planFee = unitPrice * count;
           
           // プランごとの割増の適用
-          const planSurchargeCount = plan.surcharges.length;
+          // surchargesが存在することを確認
+          const planSurchargeCount = plan.surcharges && Array.isArray(plan.surcharges) ? plan.surcharges.length : 0;
           if (planSurchargeCount > 0) {
             // 割増率の計算: (1 + SURCHARGE_RATE)^n
             const surchargeRate = Math.pow(1 + SURCHARGE_RATE, planSurchargeCount);
@@ -441,14 +456,16 @@ export const useFormStore = create<FormState & FormActions>()(
         }, 0);
         // 料金選択に基づいて多頭料金を決定
         const additionalPetFee = state.feeSelection === '旧料金' ? OLD_ADDITIONAL_PET_FEE : NEW_ADDITIONAL_PET_FEE;
-        const multiPetFee = state.multiPet.additionalPets * totalPlanCount * additionalPetFee;
+        // totalPlanCountが0の場合は0を設定（NaN防止）
+        const multiPetFee = totalPlanCount === 0 ? 0 : state.multiPet.additionalPets * totalPlanCount * additionalPetFee;
         subtotalTaxExcluded += multiPetFee;
         
         // 15分延長料金の計算 - プランの割増を適用
         let extensionFee = state.extension.count * 600;
         
         // 最初のプランの割増を15分延長オプションにも適用
-        if (state.plans.length > 0 && state.plans[0].surcharges.length > 0) {
+        // surchargesが存在し、長さが0より大きいことを確認（NaN防止）
+        if (state.plans.length > 0 && state.plans[0].surcharges && state.plans[0].surcharges.length > 0) {
           const firstPlan = state.plans[0];
           const planSurchargeCount = firstPlan.surcharges.length;
           if (planSurchargeCount > 0) {
@@ -468,7 +485,10 @@ export const useFormStore = create<FormState & FormActions>()(
         
         // その他課税オプションの計算
         const otherTaxableFees = state.taxableOptions.reduce((sum, option) => {
-          return sum + (option.unitPrice * option.count);
+          // unitPriceとcountが有効な値であることを確認
+          const unitPrice = option.unitPrice || 0;
+          const count = option.count || 0;
+          return sum + (unitPrice * count);
         }, 0);
         subtotalTaxExcluded += otherTaxableFees;
         
@@ -480,14 +500,18 @@ export const useFormStore = create<FormState & FormActions>()(
         // 非課税項目の計算
         // すべての非課税オプション（出張費を含む）
         const nonTaxableTotal = state.nonTaxableOptions.reduce((sum, option) => {
-          return sum + (option.unitPrice * option.count);
+          // unitPriceとcountが有効な値であることを確認
+          const unitPrice = option.unitPrice || 0;
+          const count = option.count || 0;
+          return sum + (unitPrice * count);
         }, 0);
         
         // キャンセル係数の適用
-        const cancelFactor = CANCEL_FACTOR[state.feeType];
-        const adjustedSubtotal = Math.floor(subtotalTaxExcluded * cancelFactor);
-        const adjustedTax = Math.floor(tax * cancelFactor);
-        const adjustedNonTaxable = Math.floor(nonTaxableTotal * cancelFactor);
+        const cancelFactor = CANCEL_FACTOR[state.feeType] || 1; // デフォルト値として1を使用
+        // NaNを防ぐために数値チェックを追加
+        const adjustedSubtotal = Math.floor(Number(subtotalTaxExcluded || 0) * cancelFactor);
+        const adjustedTax = Math.floor(Number(tax || 0) * cancelFactor);
+        const adjustedNonTaxable = Math.floor(Number(nonTaxableTotal || 0) * cancelFactor);
         
         // 合計金額の計算
         const grandTotal = adjustedSubtotal + adjustedTax + adjustedNonTaxable;

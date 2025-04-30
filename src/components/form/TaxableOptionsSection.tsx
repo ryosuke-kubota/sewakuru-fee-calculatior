@@ -10,6 +10,7 @@ import {
   OLD_KEY_HANDLING_FEE,
   NEW_KEY_HANDLING_FEE
 } from '@/utils/feeCalculator';
+import { NumberInput } from '@/components/ui/NumberInput';
 
 export function TaxableOptionsSection() {
   const { register, formState: { errors } } = useFormContext();
@@ -68,31 +69,21 @@ export function TaxableOptionsSection() {
         <div className="p-4 border rounded-md bg-gray-50">
           <h3 className="text-sm font-medium mb-3">多頭オプション（1頭あたり{additionalPetFeeText}）</h3>
           <div className="space-y-3">
-            <div>
-              <label htmlFor="multiPet" className="block text-sm font-medium text-gray-700 mb-1">
-                追加頭数（1〜3頭）
-              </label>
-              <input
-                id="multiPet"
-                type="number"
-                min="0"
-                max="3"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  (errors.multiPet as MultiPetErrors)?.additionalPets ? 'border-red-500' : ''
-                }`}
-                {...register('multiPet.additionalPets', {
-                  min: { value: 0, message: '0以上で入力してください' },
-                  max: { value: 3, message: '最大3頭までです' },
-                  valueAsNumber: true,
-                  onChange: (e) => setMultiPet(parseInt(e.target.value) || 0)
-                })}
-                defaultValue={multiPet.additionalPets}
-                aria-invalid={(errors.multiPet as MultiPetErrors)?.additionalPets ? "true" : "false"}
-              />
-              {(errors.multiPet as MultiPetErrors)?.additionalPets && (
-                <p className="mt-1 text-sm text-red-600">{(errors.multiPet as MultiPetErrors).additionalPets?.message}</p>
-              )}
-            </div>
+            <NumberInput
+              id="multiPet"
+              value={multiPet.additionalPets}
+              min={0}
+              max={3}
+              step={1}
+              label="追加頭数（1〜3頭）"
+              error={(errors.multiPet as MultiPetErrors)?.additionalPets?.message}
+              onChange={(value) => setMultiPet(value)}
+              register={register('multiPet.additionalPets', {
+                min: { value: 0, message: '0以上で入力してください' },
+                max: { value: 3, message: '最大3頭までです' },
+                valueAsNumber: true,
+              })}
+            />
             {multiPet.additionalPets > 0 && (
               <div className="text-right text-sm font-medium">
                 小計: {formatCurrency(multiPetTotal)} (税抜)
@@ -106,29 +97,19 @@ export function TaxableOptionsSection() {
         <div className="p-4 border rounded-md bg-gray-50">
           <h3 className="text-sm font-medium mb-3">鍵の受取・返却（直接）（1回あたり{keyHandlingFeeText}）</h3>
           <div className="space-y-3">
-            <div>
-              <label htmlFor="keyHandling" className="block text-sm font-medium text-gray-700 mb-1">
-                回数
-              </label>
-              <input
-                id="keyHandling"
-                type="number"
-                min="0"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  (errors.keyHandling as KeyHandlingErrors)?.count ? 'border-red-500' : ''
-                }`}
-                {...register('keyHandling.count', {
-                  min: { value: 0, message: '0以上で入力してください' },
-                  valueAsNumber: true,
-                  onChange: (e) => setKeyHandling(parseInt(e.target.value) || 0)
-                })}
-                defaultValue={keyHandling.count}
-                aria-invalid={(errors.keyHandling as KeyHandlingErrors)?.count ? "true" : "false"}
-              />
-              {(errors.keyHandling as KeyHandlingErrors)?.count && (
-                <p className="mt-1 text-sm text-red-600">{(errors.keyHandling as KeyHandlingErrors).count?.message}</p>
-              )}
-            </div>
+            <NumberInput
+              id="keyHandling"
+              value={keyHandling.count}
+              min={0}
+              step={1}
+              label="回数"
+              error={(errors.keyHandling as KeyHandlingErrors)?.count?.message}
+              onChange={(value) => setKeyHandling(value)}
+              register={register('keyHandling.count', {
+                min: { value: 0, message: '0以上で入力してください' },
+                valueAsNumber: true,
+              })}
+            />
             {keyHandling.count > 0 && (
               <div className="text-right text-sm font-medium">
                 小計: {formatCurrency(keyHandlingTotal)} (税抜)
@@ -176,56 +157,37 @@ export function TaxableOptionsSection() {
               </div>
 
               {/* 回数 */}
-              <div>
-                <label htmlFor={`option-count-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  回数 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id={`option-count-${option.id}`}
-                  type="number"
-                  min="1"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`taxableOptions.${index}.count`, { 
-                    required: '回数は必須です',
-                    min: { value: 1, message: '回数は1以上で入力してください' },
-                    valueAsNumber: true,
-                    onChange: (e) => updateTaxableOption(option.id, { count: parseInt(e.target.value) || 1 })
-                  })}
-                  defaultValue={option.count}
-                />
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.taxableOptions?.[index]?.count && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {(errors.taxableOptions as Record<number, { count?: { message?: string } }>)[index]?.count?.message}
-                  </p>
-                )}
-              </div>
+              <NumberInput
+                id={`option-count-${option.id}`}
+                value={option.count}
+                min={1}
+                label="回数"
+                required={true}
+                error={errors.taxableOptions?.[index]?.count?.message as string}
+                onChange={(value) => updateTaxableOption(option.id, { count: value })}
+                register={register(`taxableOptions.${index}.count`, {
+                  required: '回数は必須です',
+                  min: { value: 1, message: '回数は1以上で入力してください' },
+                  valueAsNumber: true,
+                })}
+              />
 
               {/* 単価 */}
-              <div>
-                <label htmlFor={`option-price-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  単価（税抜） <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id={`option-price-${option.id}`}
-                  type="number"
-                  min="0"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`taxableOptions.${index}.unitPrice`, { 
-                    required: '単価は必須です',
-                    min: { value: 0, message: '単価は0以上で入力してください' },
-                    valueAsNumber: true,
-                    onChange: (e) => updateTaxableOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
-                  })}
-                  defaultValue={option.unitPrice}
-                />
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.taxableOptions?.[index]?.unitPrice && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {(errors.taxableOptions as Record<number, { unitPrice?: { message?: string } }>)[index]?.unitPrice?.message}
-                  </p>
-                )}
-              </div>
+              <NumberInput
+                id={`option-price-${option.id}`}
+                value={option.unitPrice}
+                min={0}
+                step={100}
+                label="単価（税抜）"
+                required={true}
+                error={errors.taxableOptions?.[index]?.unitPrice?.message as string}
+                onChange={(value) => updateTaxableOption(option.id, { unitPrice: value })}
+                register={register(`taxableOptions.${index}.unitPrice`, {
+                  required: '単価は必須です',
+                  min: { value: 0, message: '単価は0以上で入力してください' },
+                  valueAsNumber: true,
+                })}
+              />
 
               {/* 小計表示 */}
               {option.name && option.count > 0 && option.unitPrice > 0 && (

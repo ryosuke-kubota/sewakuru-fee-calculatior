@@ -6,6 +6,7 @@ import { useFormStore, Surcharge } from '@/store/useFormStore';
 import { OLD_FEE_PLANS, NEW_FEE_PLANS } from '@/utils/feeCalculator';
 import { formatCurrency } from '@/utils/feeCalculator';
 import { useEffect } from 'react';
+import { NumberInput } from '@/components/ui/NumberInput';
 
 type PlanFormData = {
   plans: {
@@ -142,30 +143,21 @@ export function PlanSection() {
               </div>
 
               {/* 回数 */}
-              <div>
-                <label htmlFor={`plan-count-${plan.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  回数 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id={`plan-count-${plan.id}`}
-                  type="number"
-                  min="1"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.plans?.[index]?.count ? 'border-red-500' : ''
-                  }`}
-                  {...register(`plans.${index}.count`, {
-                    required: '回数は必須です',
-                    min: { value: 1, message: '回数は1以上で入力してください' },
-                    valueAsNumber: true,
-                    onChange: (e) => updatePlan(plan.id, { count: parseInt(e.target.value) || 1 })
-                  })}
-                  defaultValue={plan.count}
-                  aria-invalid={errors.plans?.[index]?.count ? "true" : "false"}
-                />
-                {errors.plans?.[index]?.count && (
-                  <p className="mt-1 text-sm text-red-600">{(errors.plans as Record<number, { count?: { message?: string } }>)[index]?.count?.message}</p>
-                )}
-              </div>
+              <NumberInput
+                id={`plan-count-${plan.id}`}
+                value={plan.count}
+                min={1}
+                step={1}
+                label="回数"
+                required={true}
+                error={errors.plans?.[index]?.count?.message as string}
+                onChange={(value) => updatePlan(plan.id, { count: value })}
+                register={register(`plans.${index}.count`, {
+                  required: '回数は必須です',
+                  min: { value: 1, message: '回数は1以上で入力してください' },
+                  valueAsNumber: true,
+                })}
+              />
 
               {/* 割増オプション */}
               <div className="mt-3">

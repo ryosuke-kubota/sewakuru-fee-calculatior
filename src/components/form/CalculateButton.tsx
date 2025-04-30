@@ -36,7 +36,7 @@ export function CalculateButton({ onClick }: CalculateButtonProps) {
           <ul className="list-disc pl-5 mt-2">
             {Object.entries(formState.errors).map(([field, error]) => (
               <li key={field}>
-                {field}: {(error as FieldError)?.message || 'エラーがあります'}
+                {(error as FieldError)?.message || 'エラーがあります'}
               </li>
             ))}
           </ul>

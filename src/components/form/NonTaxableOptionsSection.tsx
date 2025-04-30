@@ -4,6 +4,7 @@ import { useFormStore } from '@/store/useFormStore';
 import { formatCurrency } from '@/utils/feeCalculator';
 import { NonTaxableOption } from '@/store/useFormStore';
 import { useFormContext } from 'react-hook-form';
+import { NumberInput } from '@/components/ui/NumberInput';
 
 // 固定非課税オプションの定義
 const FIXED_OPTIONS = [
@@ -35,52 +36,36 @@ function NonTaxableOptionInput({
       <h3 className="text-sm font-medium mb-3">{option.name}</h3>
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label htmlFor={`${registerPrefix}UnitPrice`} className="block text-sm font-medium text-gray-700 mb-1">
-              単価 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id={`${registerPrefix}UnitPrice`}
-              type="number"
-              min="0"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                fieldErrors?.[index]?.unitPrice ? 'border-red-500' : ''
-              }`}
-              {...register(`nonTaxableOptions.${index}.unitPrice`, {
-                required: option.count > 0 ? '単価は必須です' : false,
-                min: { value: 0, message: '単価は0以上で入力してください' },
-                valueAsNumber: true,
-                onChange: (e) => updateOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
-              })}
-              defaultValue={option.unitPrice}
-            />
-            {fieldErrors?.[index]?.unitPrice && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors[index].unitPrice?.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor={`${registerPrefix}Count`} className="block text-sm font-medium text-gray-700 mb-1">
-              回数 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id={`${registerPrefix}Count`}
-              type="number"
-              min="0"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                fieldErrors?.[index]?.count ? 'border-red-500' : ''
-              }`}
-              {...register(`nonTaxableOptions.${index}.count`, {
-                required: option.unitPrice > 0 ? '回数は必須です' : false,
-                min: { value: 0, message: '回数は0以上で入力してください' },
-                valueAsNumber: true,
-                onChange: (e) => updateOption(option.id, { count: parseInt(e.target.value) || 0 })
-              })}
-              defaultValue={option.count}
-            />
-            {fieldErrors?.[index]?.count && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors[index].count?.message}</p>
-            )}
-          </div>
+          <NumberInput
+            id={`${registerPrefix}UnitPrice`}
+            value={option.unitPrice}
+            min={0}
+            step={100}
+            label="単価"
+            // required={option.count > 0}
+            error={fieldErrors?.[index]?.unitPrice?.message}
+            onChange={(value) => updateOption(option.id, { unitPrice: value })}
+            register={register(`nonTaxableOptions.${index}.unitPrice`, {
+              // required: option.count > 0 ? '単価は必須です' : false,
+              min: { value: 0, message: '単価は0以上で入力してください' },
+              setValueAs: (v) => v === "" ? undefined : parseInt(v, 10)
+            })}
+          />
+          <NumberInput
+            id={`${registerPrefix}Count`}
+            value={option.count}
+            min={0}
+            step={1}
+            label="回数"
+            // required={option.unitPrice > 0}
+            error={fieldErrors?.[index]?.count?.message}
+            onChange={(value) => updateOption(option.id, { count: value })}
+            register={register(`nonTaxableOptions.${index}.count`, {
+              // required: option.unitPrice > 0 ? '回数は必須です' : false,
+              min: { value: 0, message: '回数は0以上で入力してください' },
+              setValueAs: (v) => v === "" ? undefined : parseInt(v, 10)
+            })}
+          />
         </div>
         {option.count > 0 && option.unitPrice > 0 && (
           <div className="text-right text-sm font-medium mt-3">
@@ -205,56 +190,42 @@ export function NonTaxableOptionsSection() {
                 )}
               </div>
 
-              {/* 単価 */}
-              <div>
-                <label htmlFor={`non-taxable-price-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  単価 <span className="text-red-500">*</span>
-                </label>
-                <input
+              <div className="grid grid-cols-2 gap-3">
+
+
+                {/* 単価 */}
+                <NumberInput
                   id={`non-taxable-price-${option.id}`}
-                  type="number"
-                  min="0"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`nonTaxableOptions.${index}.unitPrice`, {
-                    required: option.count > 0 ? '単価は必須です' : false,
+                  value={option.unitPrice}
+                  min={0}
+                  step={100}
+                  label="単価"
+                  // required={option.count > 0}
+                  error={(errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }>)?.[index]?.unitPrice?.message}
+                  onChange={(value) => updateNonTaxableOption(option.id, { unitPrice: value })}
+                  register={register(`nonTaxableOptions.${index}.unitPrice`, {
+                    // required: option.count > 0 ? '単価は必須です' : false,
                     min: { value: 0, message: '単価は0以上で入力してください' },
                     valueAsNumber: true,
-                    onChange: (e) => updateNonTaxableOption(option.id, { unitPrice: parseInt(e.target.value) || 0 })
                   })}
-                  defaultValue={option.unitPrice}
                 />
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.nonTaxableOptions?.[index]?.unitPrice && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {(errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }>)[index]?.unitPrice?.message}
-                  </p>
-                )}
-              </div>
 
-              {/* 回数 */}
-              <div>
-                <label htmlFor={`non-taxable-count-${option.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  回数 <span className="text-red-500">*</span>
-                </label>
-                <input
+                {/* 回数 */}
+                <NumberInput
                   id={`non-taxable-count-${option.id}`}
-                  type="number"
-                  min="1"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`nonTaxableOptions.${index}.count`, {
-                    required: option.unitPrice > 0 ? '回数は必須です' : false,
+                  value={option.count}
+                  min={1}
+                  step={1}
+                  label="回数"
+                  // required={option.unitPrice > 0}
+                  error={(errors.nonTaxableOptions as Record<number, { count?: { message?: string } }>)?.[index]?.count?.message}
+                  onChange={(value) => updateNonTaxableOption(option.id, { count: value })}
+                  register={register(`nonTaxableOptions.${index}.count`, {
+                    // required: option.unitPrice > 0 ? '回数は必須です' : false,
                     min: { value: 1, message: '回数は1以上で入力してください' },
                     valueAsNumber: true,
-                    onChange: (e) => updateNonTaxableOption(option.id, { count: parseInt(e.target.value) || 1 })
                   })}
-                  defaultValue={option.count}
                 />
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
-                {errors.nonTaxableOptions?.[index]?.count && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {(errors.nonTaxableOptions as Record<number, { count?: { message?: string } }>)[index]?.count?.message}
-                  </p>
-                )}
               </div>
 
               {/* 小計表示 */}
