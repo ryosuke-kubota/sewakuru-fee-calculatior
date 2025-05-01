@@ -71,7 +71,7 @@ export function ResultSection() {
           {/* 結果表示エリア */}
           <div 
             ref={resultRef} 
-            className="p-4 border rounded-md bg-white max-w-md mx-auto"
+            className="p-4 border bg-white max-w-md mx-auto"
             style={{ maxWidth: '640px', minHeight: '200px' }}
           >
             {/* ヘッダー */}

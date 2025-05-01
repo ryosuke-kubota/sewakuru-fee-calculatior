@@ -12,6 +12,7 @@ import { NonTaxableOptionsSection } from './NonTaxableOptionsSection';
 import { ResultSection } from './ResultSection';
 import { FormSummary } from './FormSummary';
 import { CalculateButton } from './CalculateButton';
+import { ResetButton } from './ResetButton';
 
 // バリデーションスキーマ
 const formSchema = z.object({
@@ -109,7 +110,7 @@ const FIXED_OPTIONS = [
 
 export function EstimateForm() {
   const resultRef = useRef<HTMLDivElement>(null);
-  const { calculateFees, alliance, plans, nonTaxableOptions } = useFormStore();
+  const { calculateFees, resetForm, alliance, plans, nonTaxableOptions } = useFormStore();
 
   // アライアンスに応じたカラークラスを設定
   const colorClasses = alliance === 'セワクル'
@@ -230,7 +231,7 @@ export function EstimateForm() {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="max-w-md mx-auto pb-20">
+      <form onSubmit={methods.handleSubmit(onSubmit)} className="max-w-md mx-auto pb-36">
         <h1 className={`text-2xl font-bold mb-6 text-center ${colorClasses.text}`}>
           シッティング見積フォーム
         </h1>
@@ -242,6 +243,7 @@ export function EstimateForm() {
 
         <div className="mt-16 mb-16 bg-yellow-100 p-8 rounded-lg border-2 border-yellow-400 shadow-xl">
           <CalculateButton onClick={onSubmit} />
+          <ResetButton onClick={resetForm} />
         </div>
         
         <div ref={resultRef}>

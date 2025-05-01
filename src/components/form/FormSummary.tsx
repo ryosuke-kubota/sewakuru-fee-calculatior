@@ -2,9 +2,10 @@
 
 import { useFormStore } from '@/store/useFormStore';
 import { formatCurrency } from '@/utils/feeCalculator';
+import { ResetButton } from './ResetButton';
 
 export function FormSummary() {
-  const { calculationResult, alliance } = useFormStore();
+  const { calculationResult, alliance, resetForm } = useFormStore();
 
   // アライアンスに応じたカラークラスを設定
   const colorClasses = alliance === 'セワクル' 
@@ -50,6 +51,7 @@ export function FormSummary() {
             </div>
           </div>
         </div>
+        <ResetButton onClick={resetForm} />
       </div>
     </div>
   );
