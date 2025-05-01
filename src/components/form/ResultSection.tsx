@@ -55,7 +55,7 @@ export function ResultSection() {
     }).then(canvas => {
       // 画像をダウンロード
       const link = document.createElement('a');
-      link.download = `見積_${customerName}_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
+      link.download = `シッティング明細_${customerName}_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     }).catch(err => {
@@ -71,7 +71,7 @@ export function ResultSection() {
           {/* 結果表示エリア */}
           <div 
             ref={resultRef} 
-            className="p-4 border bg-white max-w-md mx-auto"
+            className="p-4 bg-white max-w-md mx-auto"
             style={{ maxWidth: '640px', minHeight: '200px' }}
           >
             {/* ヘッダー */}
@@ -102,9 +102,9 @@ export function ResultSection() {
 
             <div className="p-3 border-b">
               <div className='flex gap-1'>
-                <div className='text-xs border rounded-full px-4 py-1'>{feeType}</div>
-                <div className='text-xs border rounded-full px-4 py-1'>{feeSelection}</div>
-                <div className='text-xs border rounded-full px-4 py-1'>{alliance}</div>
+                <div className='text-xs border rounded-full px-4'><div className='text-xs h-7'>{feeType}</div></div>
+                <div className='text-xs border rounded-full px-4'><div className='text-xs h-7'>{feeSelection}</div></div>
+                <div className='text-xs border rounded-full px-4'><div className='text-xs h-7'>{alliance}</div></div>
               </div>
             </div>
 

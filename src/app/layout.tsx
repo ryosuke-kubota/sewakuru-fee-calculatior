@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "シッティング見積フォーム | セワクル",
+  title: "シッティング計算機",
   description: "犬・小動物シッティングの概算見積をスマホ中心で素早く作成し、その結果を1画面に収めたスクショとして共有できるWebフォーム",
 };
 

@@ -233,7 +233,7 @@ export function EstimateForm() {
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="max-w-md mx-auto pb-36">
         <h1 className={`text-2xl font-bold mb-6 text-center ${colorClasses.text}`}>
-          シッティング見積フォーム
+          シッティング計算機
         </h1>
 
         <BasicInfoSection />
