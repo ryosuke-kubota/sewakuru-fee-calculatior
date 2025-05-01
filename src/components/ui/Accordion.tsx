@@ -2,6 +2,7 @@
 
 import { useState, ReactNode } from 'react';
 import clsx from 'clsx';
+import { useFormStore } from '@/store/useFormStore';
 
 interface AccordionProps {
   title: string;
@@ -13,13 +14,21 @@ interface AccordionProps {
 export function Accordion({ title, children, defaultOpen = false, className = '' }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  const { alliance } = useFormStore();
+
+  // アライアンスに応じたカラークラスを設定
+  const colorClasses = alliance === 'セワクル'
+    ? { primary: 'bg-sewakuru-primary', text: 'text-sewakuru-primary' }
+    : { primary: 'bg-tokyu-primary', text: 'text-tokyu-primary' };
+
   return (
     <div className={clsx('border rounded-md mb-4', className)}>
       <button
         type="button"
         className={clsx(
-          'w-full px-4 py-3 text-left font-medium flex justify-between items-center',
+          'w-full px-4 py-3 text-left font-medium flex justify-between items-center text-white',
           'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+          colorClasses.primary,
           isOpen ? 'border-b' : ''
         )}
         onClick={() => setIsOpen(!isOpen)}

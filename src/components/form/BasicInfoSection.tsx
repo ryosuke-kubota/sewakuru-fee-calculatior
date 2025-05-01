@@ -114,7 +114,7 @@ export function BasicInfoSection() {
                   value={type}
                   name="feeType"
                 />
-                <span className="ml-2 text-sm">{type}</span>
+                <span className="ml-2 text-sm whitespace-nowrap">{type}</span>
               </label>
             ))}
           </div>
@@ -134,7 +134,7 @@ export function BasicInfoSection() {
                   value={selection}
                   name="feeSelection"
                 />
-                <span className="ml-2 text-sm">{selection}{selection === '新料金' && ' (2025年7月〜)'}</span>
+                <span className="ml-2 text-sm whitespace-nowrap">{selection}{selection === '新料金' && ' (2025年7月〜)'}</span>
               </label>
             ))}
           </div>
@@ -154,7 +154,7 @@ export function BasicInfoSection() {
                   value={allianceOption}
                   name="alliance"
                 />
-                <span className="ml-2 text-sm">{allianceOption}</span>
+                <span className="ml-2 text-sm whitespace-nowrap">{allianceOption}</span>
               </label>
             ))}
           </div>
@@ -174,7 +174,7 @@ export function BasicInfoSection() {
                   value={counselingOption}
                   name="counseling"
                 />
-                <span className="ml-2 text-sm">{counselingOption}</span>
+                <span className="ml-2 text-sm whitespace-nowrap">{counselingOption}</span>
               </label>
             ))}
           </div>

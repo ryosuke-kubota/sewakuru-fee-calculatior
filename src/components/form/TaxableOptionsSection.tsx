@@ -157,38 +157,40 @@ export function TaxableOptionsSection() {
                 )}
               </div>
 
-              {/* 回数 */}
-              <NumberInput
-                id={`option-count-${option.id}`}
-                value={option.count}
-                min={1}
-                label="回数"
-                required={true}
-                error={errors.taxableOptions?.[index]?.count?.message as string}
-                onChange={(value) => updateTaxableOption(option.id, { count: value })}
-                register={register(`taxableOptions[${index}].count` as FieldPath<FormValues>, {
-                  required: '回数は必須です',
-                  min: { value: 1, message: '回数は1以上で入力してください' },
-                  valueAsNumber: true,
-                })}
-              />
+              <div className="grid grid-cols-2 gap-3">
+                {/* 単価 */}
+                <NumberInput
+                  id={`option-price-${option.id}`}
+                  value={option.unitPrice}
+                  min={0}
+                  step={100}
+                  label="単価（税抜）"
+                  // required={true}
+                  error={errors.taxableOptions?.[index]?.unitPrice?.message as string}
+                  onChange={(value) => updateTaxableOption(option.id, { unitPrice: value })}
+                  register={register(`taxableOptions[${index}].unitPrice` as FieldPath<FormValues>, {
+                    // required: '単価は必須です',
+                    min: { value: 0, message: '単価は0以上で入力してください' },
+                    valueAsNumber: true,
+                  })}
+                />
 
-              {/* 単価 */}
-              <NumberInput
-                id={`option-price-${option.id}`}
-                value={option.unitPrice}
-                min={0}
-                step={100}
-                label="単価（税抜）"
-                required={true}
-                error={errors.taxableOptions?.[index]?.unitPrice?.message as string}
-                onChange={(value) => updateTaxableOption(option.id, { unitPrice: value })}
-                register={register(`taxableOptions[${index}].unitPrice` as FieldPath<FormValues>, {
-                  required: '単価は必須です',
-                  min: { value: 0, message: '単価は0以上で入力してください' },
-                  valueAsNumber: true,
-                })}
-              />
+                {/* 回数 */}
+                <NumberInput
+                  id={`option-count-${option.id}`}
+                  value={option.count}
+                  min={1}
+                  label="回数"
+                  // required={true}
+                  error={errors.taxableOptions?.[index]?.count?.message as string}
+                  onChange={(value) => updateTaxableOption(option.id, { count: value })}
+                  register={register(`taxableOptions[${index}].count` as FieldPath<FormValues>, {
+                    // required: '回数は必須です',
+                    min: { value: 1, message: '回数は1以上で入力してください' },
+                    valueAsNumber: true,
+                  })}
+                />
+              </div>
 
               {/* 小計表示 */}
               {option.name && option.count > 0 && option.unitPrice > 0 && (
