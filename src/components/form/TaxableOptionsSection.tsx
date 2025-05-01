@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, FieldPath } from 'react-hook-form';
+import type { FormValues } from './EstimateForm';
 import { Accordion } from '@/components/ui/Accordion';
 import { useFormStore } from '@/store/useFormStore';
 import {
@@ -13,7 +14,8 @@ import {
 import { NumberInput } from '@/components/ui/NumberInput';
 
 export function TaxableOptionsSection() {
-  const { register, formState: { errors } } = useFormContext();
+
+  const { register, formState: { errors } } = useFormContext<FormValues>();
   
   // エラーオブジェクトの型定義
   type MultiPetErrors = {
@@ -142,13 +144,12 @@ export function TaxableOptionsSection() {
                   id={`option-name-${option.id}`}
                   type="text"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register(`taxableOptions.${index}.name`, { 
+                  {...register(`taxableOptions[${index}].name` as FieldPath<FormValues>, {
                     required: 'オプション名は必須です',
                     onChange: (e) => updateTaxableOption(option.id, { name: e.target.value })
                   })}
                   defaultValue={option.name}
                 />
-                {/* @ts-expect-error - React Hook Form型定義の問題を回避 */}
                 {errors.taxableOptions?.[index]?.name && (
                   <p className="mt-1 text-sm text-red-600">
                     {(errors.taxableOptions as Record<number, { name?: { message?: string } }>)[index]?.name?.message}
@@ -165,7 +166,7 @@ export function TaxableOptionsSection() {
                 required={true}
                 error={errors.taxableOptions?.[index]?.count?.message as string}
                 onChange={(value) => updateTaxableOption(option.id, { count: value })}
-                register={register(`taxableOptions.${index}.count`, {
+                register={register(`taxableOptions[${index}].count` as FieldPath<FormValues>, {
                   required: '回数は必須です',
                   min: { value: 1, message: '回数は1以上で入力してください' },
                   valueAsNumber: true,
@@ -182,7 +183,7 @@ export function TaxableOptionsSection() {
                 required={true}
                 error={errors.taxableOptions?.[index]?.unitPrice?.message as string}
                 onChange={(value) => updateTaxableOption(option.id, { unitPrice: value })}
-                register={register(`taxableOptions.${index}.unitPrice`, {
+                register={register(`taxableOptions[${index}].unitPrice` as FieldPath<FormValues>, {
                   required: '単価は必須です',
                   min: { value: 0, message: '単価は0以上で入力してください' },
                   valueAsNumber: true,

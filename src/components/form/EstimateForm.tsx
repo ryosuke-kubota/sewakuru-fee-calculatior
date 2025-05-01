@@ -60,7 +60,7 @@ const formSchema = z.object({
 });
 
 // 必須フィールドを明示的に指定した型
-type FormValues = {
+export type FormValues = {
   customerName: string;
   sitterName: string;
   sittingDateTime: string;
