@@ -137,7 +137,8 @@ export function EstimateForm() {
   // React Hook Formの設定
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange',
+    mode: 'all', // onChangeからallに変更して、すべての変更でバリデーションを実行
+    reValidateMode: 'onChange', // 再バリデーションもすべての変更で実行
   });
 
   // コンポーネントマウント時に初期値を設定
@@ -161,11 +162,25 @@ export function EstimateForm() {
 
   // フォームの状態が変更されたときにバリデーションを実行
   useEffect(() => {
-    // フォームが送信された後のみバリデーションを実行
-    if (methods.formState.isSubmitted) {
-      methods.trigger();
-    }
-  }, [methods]);
+    // フォームの値が変更されたときに常にバリデーションを実行
+    methods.trigger();
+  }, [
+    customerName,
+    sitterName,
+    sittingDateTime,
+    feeType,
+    feeSelection,
+    alliance,
+    counseling,
+    surcharges,
+    multiPet,
+    extension,
+    keyHandling,
+    taxableOptions,
+    plans,
+    nonTaxableOptions,
+    methods
+  ]);
 
   // フォーム送信処理
   const onSubmit = async () => {

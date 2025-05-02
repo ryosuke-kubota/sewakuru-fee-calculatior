@@ -29,7 +29,7 @@ function NonTaxableOptionInput({
   index: number,
   plans: Plan[]
 }) {
-  const { register, formState: { errors } } = useFormContext();
+  const { register, formState: { errors }, clearErrors } = useFormContext();
   
   // エラーオブジェクトの取得（型アサーションを使用）
   const fieldErrors = errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string }, count?: { message?: string } }> | undefined;
@@ -60,9 +60,16 @@ function NonTaxableOptionInput({
             error={fieldErrors?.[index]?.unitPrice?.message}
             onChange={(value) => updateOption(option.id, { unitPrice: value })}
             register={register(`nonTaxableOptions.${index}.unitPrice`, {
-              // required: option.count > 0 ? '単価は必須です' : false,
+              required: option.count > 0 ? '単価は必須です' : false,
               min: { value: 0, message: '単価は0以上で入力してください' },
-              setValueAs: (v) => v === "" ? undefined : parseInt(v, 10)
+              setValueAs: (v) => v === "" ? undefined : parseInt(v, 10),
+              onChange: () => {
+                // TypeScriptエラーを回避するために型アサーションを使用
+                const fieldErrors = errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }> | undefined;
+                if (fieldErrors?.[index]?.unitPrice) {
+                  clearErrors(`nonTaxableOptions.${index}.unitPrice`);
+                }
+              }
             })}
           />
           <NumberInput
@@ -75,9 +82,16 @@ function NonTaxableOptionInput({
             error={fieldErrors?.[index]?.count?.message}
             onChange={(value) => updateOption(option.id, { count: value })}
             register={register(`nonTaxableOptions.${index}.count`, {
-              // required: option.unitPrice > 0 ? '回数は必須です' : false,
+              required: option.unitPrice > 0 ? '回数は必須です' : false,
               min: { value: 0, message: '回数は0以上で入力してください' },
-              setValueAs: (v) => v === "" ? undefined : parseInt(v, 10)
+              setValueAs: (v) => v === "" ? undefined : parseInt(v, 10),
+              onChange: () => {
+                // TypeScriptエラーを回避するために型アサーションを使用
+                const fieldErrors = errors.nonTaxableOptions as Record<number, { count?: { message?: string } }> | undefined;
+                if (fieldErrors?.[index]?.count) {
+                  clearErrors(`nonTaxableOptions.${index}.count`);
+                }
+              }
             })}
           />
         </div>
@@ -101,7 +115,7 @@ export function NonTaxableOptionsSection() {
     plans
   } = useFormStore();
   
-  const { register, formState: { errors } } = useFormContext();
+  const { register, formState: { errors }, clearErrors } = useFormContext();
 
   // 出張費の更新ハンドラー（互換性のために残す）
   const handleTransportationUpdate = (id: string, data: Partial<NonTaxableOption>) => {
@@ -220,9 +234,16 @@ export function NonTaxableOptionsSection() {
                   error={(errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }>)?.[index]?.unitPrice?.message}
                   onChange={(value) => updateNonTaxableOption(option.id, { unitPrice: value })}
                   register={register(`nonTaxableOptions.${index}.unitPrice`, {
-                    // required: option.count > 0 ? '単価は必須です' : false,
+                    required: option.count > 0 ? '単価は必須です' : false,
                     min: { value: 0, message: '単価は0以上で入力してください' },
                     valueAsNumber: true,
+                    onChange: () => {
+                      // TypeScriptエラーを回避するために型アサーションを使用
+                      const fieldErrors = errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }> | undefined;
+                      if (fieldErrors?.[index]?.unitPrice) {
+                        clearErrors(`nonTaxableOptions.${index}.unitPrice`);
+                      }
+                    }
                   })}
                 />
 
@@ -237,9 +258,16 @@ export function NonTaxableOptionsSection() {
                   error={(errors.nonTaxableOptions as Record<number, { count?: { message?: string } }>)?.[index]?.count?.message}
                   onChange={(value) => updateNonTaxableOption(option.id, { count: value })}
                   register={register(`nonTaxableOptions.${index}.count`, {
-                    // required: option.unitPrice > 0 ? '回数は必須です' : false,
+                    required: option.unitPrice > 0 ? '回数は必須です' : false,
                     min: { value: 1, message: '回数は1以上で入力してください' },
                     valueAsNumber: true,
+                    onChange: () => {
+                      // TypeScriptエラーを回避するために型アサーションを使用
+                      const fieldErrors = errors.nonTaxableOptions as Record<number, { count?: { message?: string } }> | undefined;
+                      if (fieldErrors?.[index]?.count) {
+                        clearErrors(`nonTaxableOptions.${index}.count`);
+                      }
+                    }
                   })}
                 />
               </div>

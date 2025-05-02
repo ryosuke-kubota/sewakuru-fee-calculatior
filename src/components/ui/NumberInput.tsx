@@ -82,6 +82,17 @@ export function NumberInput({
         setDisplayValue(min.toString());
         setInternalValue(min);
         onChange(min);
+        
+        // React Hook Formのバリデーションを即時実行するために、イベントを発火
+        if (register && inputRef.current) {
+          const event = new Event('change', { bubbles: true });
+          Object.defineProperty(event, 'target', {
+            writable: false,
+            value: { value: min.toString(), name: register.name }
+          });
+          inputRef.current.dispatchEvent(event);
+        }
+        
         return;
       }
       
@@ -98,6 +109,16 @@ export function NumberInput({
       setInternalValue(numValue);
       setDisplayValue(numValue.toString());
       onChange(numValue);
+      
+      // React Hook Formのバリデーションを即時実行するために、イベントを発火
+      if (register && inputRef.current) {
+        const event = new Event('change', { bubbles: true });
+        Object.defineProperty(event, 'target', {
+          writable: false,
+          value: { value: numValue.toString(), name: register.name }
+        });
+        inputRef.current.dispatchEvent(event);
+      }
     } catch (error) {
       // エラーが発生した場合は現在の値に戻す
       setDisplayValue(internalValue.toString());
@@ -136,6 +157,11 @@ export function NumberInput({
           }
         };
         register.onBlur(newEvent as React.FocusEvent<HTMLInputElement>);
+        
+        // バリデーションを即時実行するために、changeイベントも発火
+        if (register.onChange) {
+          register.onChange(newEvent as unknown as React.ChangeEvent<HTMLInputElement>);
+        }
       }
     },
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
