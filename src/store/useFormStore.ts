@@ -10,8 +10,10 @@ import {
   NEW_KEY_HANDLING_FEE,
   FREE_COUNSELING_FEE,
   PAID_COUNSELING_FEE,
-  SEWAKURU_TRANSPORTATION_FEE,
-  TOKYU_TRANSPORTATION_FEE
+  OLD_SEWAKURU_TRANSPORTATION_FEE,
+  NEW_SEWAKURU_TRANSPORTATION_FEE,
+  OLD_TOKYU_TRANSPORTATION_FEE,
+  NEW_TOKYU_TRANSPORTATION_FEE
 } from '@/utils/feeCalculator';
 
 // 料金タイプの定義
@@ -180,14 +182,14 @@ const getInitialState = (): FormState => ({
 
   transportationFee: {
     count: 0, // バリデーションエラーを防ぐために0に設定
-    unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
+    unitPrice: OLD_SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費（旧料金）
   },
   nonTaxableOptions: [
     {
       id: 'nontaxable-transportation', // 出張費も非課税オプションとして扱う
       name: '出張費',
       count: 0, // バリデーションエラーを防ぐために0に設定
-      unitPrice: SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費
+      unitPrice: OLD_SEWAKURU_TRANSPORTATION_FEE, // デフォルトはセワクル出張費（旧料金）
     },
     {
       id: 'nontaxable-parking',
@@ -223,13 +225,48 @@ export const useFormStore = create<FormState & FormActions>()(
       setSitterName: (name) => set({ sitterName: name }),
       setSittingDateTime: (dateTime) => set({ sittingDateTime: dateTime }),
       setFeeType: (type) => set({ feeType: type }),
-      setFeeSelection: (selection) => set({ feeSelection: selection }),
-      setAlliance: (alliance) => {
-        // アライアンスに基づいて出張費を設定
-        const transportationFeeUnitPrice = alliance === 'セワクル' ? SEWAKURU_TRANSPORTATION_FEE : TOKYU_TRANSPORTATION_FEE;
-        
+      setFeeSelection: (selection) => {
         // 現在の状態を取得
         const currentState = get();
+        const alliance = currentState.alliance;
+        
+        // 料金選択とアライアンスに基づいて出張費を設定
+        let transportationFeeUnitPrice;
+        if (alliance === 'セワクル') {
+          transportationFeeUnitPrice = selection === '旧料金' ? OLD_SEWAKURU_TRANSPORTATION_FEE : NEW_SEWAKURU_TRANSPORTATION_FEE;
+        } else {
+          transportationFeeUnitPrice = selection === '旧料金' ? OLD_TOKYU_TRANSPORTATION_FEE : NEW_TOKYU_TRANSPORTATION_FEE;
+        }
+        
+        // 出張費の非課税オプションを更新
+        const updatedNonTaxableOptions = currentState.nonTaxableOptions.map(option =>
+          option.id === 'nontaxable-transportation'
+            ? { ...option, unitPrice: transportationFeeUnitPrice }
+            : option
+        );
+        
+        // 状態を更新
+        set({
+          feeSelection: selection,
+          transportationFee: {
+            ...currentState.transportationFee,
+            unitPrice: transportationFeeUnitPrice
+          },
+          nonTaxableOptions: updatedNonTaxableOptions
+        });
+      },
+      setAlliance: (alliance) => {
+        // 現在の状態を取得
+        const currentState = get();
+        const feeSelection = currentState.feeSelection;
+        
+        // 料金選択とアライアンスに基づいて出張費を設定
+        let transportationFeeUnitPrice;
+        if (alliance === 'セワクル') {
+          transportationFeeUnitPrice = feeSelection === '旧料金' ? OLD_SEWAKURU_TRANSPORTATION_FEE : NEW_SEWAKURU_TRANSPORTATION_FEE;
+        } else {
+          transportationFeeUnitPrice = feeSelection === '旧料金' ? OLD_TOKYU_TRANSPORTATION_FEE : NEW_TOKYU_TRANSPORTATION_FEE;
+        }
         
         // 出張費の非課税オプションを更新
         const updatedNonTaxableOptions = currentState.nonTaxableOptions.map(option =>

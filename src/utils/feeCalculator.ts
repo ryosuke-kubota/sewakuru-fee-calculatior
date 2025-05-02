@@ -37,9 +37,17 @@ export const PAID_COUNSELING_FEE = 2000; // 有料カウンセリングの場合
 export const COUNSELING_FEE = 1000; // 後方互換性のため残す
 export const COUNSELING_TRANSPORTATION_FEE = 455; // カウンセリング交通費
 
-// 出張費
-export const SEWAKURU_TRANSPORTATION_FEE = 800; // セワクル出張費
-export const TOKYU_TRANSPORTATION_FEE = 1000; // 東急出張費
+// 出張費（旧料金）
+export const OLD_SEWAKURU_TRANSPORTATION_FEE = 546; // セワクル出張費（旧料金）
+export const OLD_TOKYU_TRANSPORTATION_FEE = 546; // 東急出張費（旧料金）
+
+// 出張費（新料金 - 2025年7月〜）
+export const NEW_SEWAKURU_TRANSPORTATION_FEE = 1000; // セワクル出張費（新料金）
+export const NEW_TOKYU_TRANSPORTATION_FEE = 1200; // 東急出張費（新料金）
+
+// 後方互換性のために残す
+export const SEWAKURU_TRANSPORTATION_FEE = OLD_SEWAKURU_TRANSPORTATION_FEE;
+export const TOKYU_TRANSPORTATION_FEE = OLD_TOKYU_TRANSPORTATION_FEE;
 
 // 多頭料金（1頭あたり）
 export const OLD_ADDITIONAL_PET_FEE = 800;

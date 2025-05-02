@@ -9,6 +9,7 @@ import html2canvas from 'html2canvas';
 export function ResultSection() {
   const resultRef = useRef<HTMLDivElement>(null);
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [isViewResult, setIsViewResult] = useState<boolean>(true)
   
   const {
     customerName,
@@ -42,28 +43,28 @@ export function ResultSection() {
     : { primary: 'bg-tokyu-primary', light: 'bg-tokyu-light', text: 'text-tokyu-primary' };
 
   // 結果をスクリーンショットとして保存する関数
-  const saveResultAsImage = () => {
-    if (!resultRef.current || !calculationResult) return;
+  // const saveResultAsImage = () => {
+  //   if (!resultRef.current || !calculationResult) return;
 
-    const resultElement = resultRef.current;
+  //   const resultElement = resultRef.current;
 
-    // html2canvasを使用してHTML要素を画像に変換
-    html2canvas(resultElement, {
-      backgroundColor: '#ffffff',
-      scale: 2, // 高解像度のために2倍のスケールで描画
-      useCORS: true, // クロスオリジンの画像を許可
-      logging: false, // デバッグログを無効化
-    }).then(canvas => {
-      // 画像をダウンロード
-      const link = document.createElement('a');
-      link.download = `シッティング明細_${customerName}_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }).catch(err => {
-      console.error('画像の生成に失敗しました:', err);
-      alert('画像の生成に失敗しました');
-    });
-  };
+  //   // html2canvasを使用してHTML要素を画像に変換
+  //   html2canvas(resultElement, {
+  //     backgroundColor: '#ffffff',
+  //     scale: 2, // 高解像度のために2倍のスケールで描画
+  //     useCORS: true, // クロスオリジンの画像を許可
+  //     logging: false, // デバッグログを無効化
+  //   }).then(canvas => {
+  //     // 画像をダウンロード
+  //     const link = document.createElement('a');
+  //     link.download = `シッティング明細_${customerName}_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
+  //     link.href = canvas.toDataURL('image/png');
+  //     link.click();
+  //   }).catch(err => {
+  //     console.error('画像の生成に失敗しました:', err);
+  //     alert('画像の生成に失敗しました');
+  //   });
+  // };
 
   // 結果を画像として生成する関数
   const generateResultImage = () => {
@@ -89,10 +90,12 @@ export function ResultSection() {
   // 計算結果が更新されたときに画像を生成
   useEffect(() => {
     if (calculationResult) {
+      setIsViewResult(true)
       // 少し遅延させて、DOMが完全に描画された後に実行
       const timer = setTimeout(() => {
         generateResultImage();
-      }, 500);
+        setIsViewResult(false)
+      }, 100);
       return () => clearTimeout(timer);
     } else {
       setResultImage(null);
@@ -105,7 +108,7 @@ export function ResultSection() {
         <div className="space-y-4">
           <div
             ref={resultRef}
-            className="p-4 bg-white max-w-md mx-auto"
+            className={`p-4 bg-white max-w-md mx-auto ${!isViewResult && 'hidden'}`}
             style={{ maxWidth: '640px', minHeight: '200px' }}
           >
               {/* ヘッダー */}
@@ -273,20 +276,20 @@ export function ResultSection() {
 
           {/* アクションボタン */}
           <div className="flex space-x-2">
-            <button
+            {/* <button
               type="button"
               className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               onClick={saveResultAsImage}
             >
               画像として保存
-            </button>
-            <button
+            </button> */}
+            {/* <button
               type="button"
               className="flex-1 py-2 px-4 bg-purple-500 text-white rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
               onClick={generateResultImage}
             >
               画像を再生成
-            </button>
+            </button> */}
             <a
               href={`/receipt?data=${encodeURIComponent(JSON.stringify({
                 customerName,
@@ -304,7 +307,7 @@ export function ResultSection() {
                 calculationResult
               }))}`}
               target="_blank"
-              className="flex-1 py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-center"
+              className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-center"
             >
               別ページで表示
             </a>
