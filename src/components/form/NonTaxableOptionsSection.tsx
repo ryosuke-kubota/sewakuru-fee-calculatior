@@ -1,10 +1,11 @@
 'use client';
 import { Accordion } from '@/components/ui/Accordion';
-import { useFormStore } from '@/store/useFormStore';
+import { Plan, useFormStore } from '@/store/useFormStore';
 import { formatCurrency } from '@/utils/feeCalculator';
 import { NonTaxableOption } from '@/store/useFormStore';
 import { useFormContext } from 'react-hook-form';
 import { NumberInput } from '@/components/ui/NumberInput';
+import { useEffect } from 'react';
 
 // 固定非課税オプションの定義
 const FIXED_OPTIONS = [
@@ -20,16 +21,27 @@ function NonTaxableOptionInput({
   registerPrefix,
   updateOption,
   index,
+  plans
 }: {
   option: NonTaxableOption,
   registerPrefix: string,
   updateOption: (id: string, data: Partial<NonTaxableOption>) => void,
   index: number,
+  plans: Plan[]
 }) {
   const { register, formState: { errors } } = useFormContext();
   
   // エラーオブジェクトの取得（型アサーションを使用）
   const fieldErrors = errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string }, count?: { message?: string } }> | undefined;
+
+  // プランが更新された時の処理
+  useEffect(() => {
+    // 出張費の場合のみ処理
+    if (option.id === 'nontaxable-transportation') {
+      // 回数をプラン数に合わせて更新
+      updateOption(option.id, { count: plans.length });
+    }
+  }, [plans]);
   
   return (
     <div className="p-4 border rounded-md bg-gray-50">
@@ -84,6 +96,7 @@ export function NonTaxableOptionsSection() {
     addNonTaxableOption,
     updateNonTaxableOption,
     removeNonTaxableOption,
+    plans
   } = useFormStore();
   
   const { register, formState: { errors } } = useFormContext();
@@ -143,6 +156,7 @@ export function NonTaxableOptionsSection() {
             registerPrefix={option.registerPrefix}
             updateOption={getUpdateHandler(option.id)}
             index={index}
+            plans={plans}
           />
         ))}
 
