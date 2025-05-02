@@ -3,7 +3,7 @@
 import { formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
 import { useRef, useState, useEffect, Suspense } from 'react';
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { FormState } from '@/store/useFormStore';
@@ -71,28 +71,28 @@ function ReceiptContent() {
     : { primary: 'bg-tokyu-primary', light: 'bg-tokyu-light', text: 'text-tokyu-primary' };
 
   // 結果をスクリーンショットとして保存する関数
-  const saveResultAsImage = () => {
-    if (!resultRef.current || !calculationResult) return;
+  // const saveResultAsImage = () => {
+  //   if (!resultRef.current || !calculationResult) return;
 
-    const resultElement = resultRef.current;
+  //   const resultElement = resultRef.current;
 
-    // html2canvasを使用してHTML要素を画像に変換
-    html2canvas(resultElement, {
-      backgroundColor: '#ffffff',
-      scale: 2, // 高解像度のために2倍のスケールで描画
-      useCORS: true, // クロスオリジンの画像を許可
-      logging: false, // デバッグログを無効化
-    }).then(canvas => {
-      // 画像をダウンロード
-      const link = document.createElement('a');
-      link.download = `見積_${customerName}_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }).catch(err => {
-      console.error('画像の生成に失敗しました:', err);
-      alert('画像の生成に失敗しました');
-    });
-  };
+  //   // html2canvasを使用してHTML要素を画像に変換
+  //   html2canvas(resultElement, {
+  //     backgroundColor: '#ffffff',
+  //     scale: 2, // 高解像度のために2倍のスケールで描画
+  //     useCORS: true, // クロスオリジンの画像を許可
+  //     logging: false, // デバッグログを無効化
+  //   }).then(canvas => {
+  //     // 画像をダウンロード
+  //     const link = document.createElement('a');
+  //     link.download = `見積_${customerName}_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
+  //     link.href = canvas.toDataURL('image/png');
+  //     link.click();
+  //   }).catch(err => {
+  //     console.error('画像の生成に失敗しました:', err);
+  //     alert('画像の生成に失敗しました');
+  //   });
+  // };
 
   if (!calculationResult) {
     return (
