@@ -110,7 +110,24 @@ const FIXED_OPTIONS = [
 
 export function EstimateForm() {
   const resultRef = useRef<HTMLDivElement>(null);
-  const { calculateFees, resetForm, alliance, plans, nonTaxableOptions } = useFormStore();
+  const {
+    calculateFees,
+    resetForm,
+    plans,
+    nonTaxableOptions,
+    customerName,
+    sitterName,
+    sittingDateTime,
+    feeType,
+    feeSelection,
+    alliance,
+    counseling,
+    surcharges,
+    multiPet,
+    extension,
+    keyHandling,
+    taxableOptions
+  } = useFormStore();
 
   // アライアンスに応じたカラークラスを設定
   const colorClasses = alliance === 'セワクル'
@@ -122,32 +139,33 @@ export function EstimateForm() {
     resolver: zodResolver(formSchema),
     mode: 'onChange',
   });
-  
+
   // コンポーネントマウント時に初期値を設定
   useEffect(() => {
-    // 初期値を設定
-    methods.setValue('feeType', '通常');
-    methods.setValue('feeSelection', '旧料金');
-    methods.setValue('alliance', 'セワクル');
-    methods.setValue('counseling', '無料');
-    methods.setValue('surcharges', []);
-    methods.setValue('multiPet', { additionalPets: 0 });
-    methods.setValue('extension', { count: 0 });
-    methods.setValue('keyHandling', { count: 0 });
-    methods.setValue('taxableOptions', []);
-  }, [methods]);
-
-  // フォームの状態が変更されたときに値を設定
-  useEffect(() => {
-    // フォームの値を設定
+    // ローカルストレージから復元された値をReact Hook Formに設定
+    methods.setValue('customerName', customerName);
+    methods.setValue('sitterName', sitterName);
+    methods.setValue('sittingDateTime', sittingDateTime);
+    methods.setValue('feeType', feeType);
+    methods.setValue('feeSelection', feeSelection);
+    methods.setValue('alliance', alliance);
+    methods.setValue('counseling', counseling);
+    methods.setValue('surcharges', surcharges);
+    methods.setValue('multiPet', multiPet);
+    methods.setValue('extension', extension);
+    methods.setValue('keyHandling', keyHandling);
+    methods.setValue('taxableOptions', taxableOptions);
     methods.setValue('plans', plans);
     methods.setValue('nonTaxableOptions', nonTaxableOptions);
-    
+  }, [methods, customerName, sitterName, sittingDateTime, feeType, feeSelection, alliance, counseling, surcharges, multiPet, extension, keyHandling, taxableOptions, plans, nonTaxableOptions]);
+
+  // フォームの状態が変更されたときにバリデーションを実行
+  useEffect(() => {
     // フォームが送信された後のみバリデーションを実行
     if (methods.formState.isSubmitted) {
       methods.trigger();
     }
-  }, [methods, plans, nonTaxableOptions]);
+  }, [methods]);
 
   // フォーム送信処理
   const onSubmit = async () => {

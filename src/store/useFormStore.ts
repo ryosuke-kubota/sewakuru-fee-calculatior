@@ -160,7 +160,7 @@ interface FormActions {
 const getInitialState = (): FormState => ({
   customerName: '',
   sitterName: '',
-  sittingDateTime: dayjs().format('YYYY/MM/DD HH:mm'),
+  sittingDateTime: dayjs().format('YYYY-MM-DDTHH:mm'),
   feeType: '通常',
   feeSelection: '旧料金',
   alliance: 'セワクル',

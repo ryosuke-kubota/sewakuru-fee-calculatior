@@ -8,9 +8,6 @@ export function BasicInfoSection() {
   const { register, formState: { errors } } = useFormContext();
   
   const {
-    customerName,
-    sitterName,
-    sittingDateTime,
     feeType,
     feeSelection,
     alliance,
@@ -42,7 +39,6 @@ export function BasicInfoSection() {
               required: 'お客様名は必須です',
               onChange: (e) => setCustomerName(e.target.value)
             })}
-            defaultValue={customerName}
             aria-invalid={errors.customerName ? "true" : "false"}
           />
           {errors.customerName && (
@@ -65,7 +61,6 @@ export function BasicInfoSection() {
               required: '担当シッター名は必須です',
               onChange: (e) => setSitterName(e.target.value)
             })}
-            defaultValue={sitterName}
             aria-invalid={errors.sitterName ? "true" : "false"}
           />
           {errors.sitterName && (
@@ -87,12 +82,10 @@ export function BasicInfoSection() {
             {...register('sittingDateTime', {
               required: 'シッティング日時は必須です',
               onChange: (e) => {
-                // 日付フォーマットを YYYY/MM/DD HH:mm に変換
-                const formattedDate = e.target.value.replace(/-/g, '/');
-                setSittingDateTime(formattedDate);
+                // 日付フォーマットをそのまま使用
+                setSittingDateTime(e.target.value);
               }
             })}
-            defaultValue={sittingDateTime.replace(/\//g, '-')}
             aria-invalid={errors.sittingDateTime ? "true" : "false"}
           />
           {errors.sittingDateTime && (
