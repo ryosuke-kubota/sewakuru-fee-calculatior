@@ -164,7 +164,7 @@ export function PlanSection() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   割増オプション
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 my-2">
                   <label className="inline-flex items-center">
                     <input
                       type="checkbox"

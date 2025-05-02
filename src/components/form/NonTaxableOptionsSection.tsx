@@ -49,7 +49,7 @@ function NonTaxableOptionInput({
     <div className="p-4 border rounded-md bg-gray-50">
       <h3 className="text-sm font-medium mb-3">{option.name}</h3>
       <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex gap-3">
           <NumberInput
             id={`${registerPrefix}UnitPrice`}
             value={option.unitPrice}
@@ -60,7 +60,14 @@ function NonTaxableOptionInput({
             error={fieldErrors?.[index]?.unitPrice?.message}
             onChange={(value) => updateOption(option.id, { unitPrice: value })}
             register={register(`nonTaxableOptions.${index}.unitPrice`, {
-              required: option.count > 0 ? '単価は必須です' : false,
+              // 単価は回数が入力された場合のみ必須（初期状態ではエラーを表示しない）
+              validate: (value) => {
+                // 回数が入力されていて、単価が未入力の場合のみエラー
+                if (option.count > 0 && (value === undefined || value === null || value === 0)) {
+                  return '単価は必須です';
+                }
+                return true;
+              },
               min: { value: 0, message: '単価は0以上で入力してください' },
               setValueAs: (v) => v === "" ? undefined : parseInt(v, 10),
               onChange: () => {
@@ -74,6 +81,7 @@ function NonTaxableOptionInput({
           />
           <NumberInput
             id={`${registerPrefix}Count`}
+            className='max-w-[130px]'
             value={option.count}
             min={0}
             step={1}
@@ -82,7 +90,14 @@ function NonTaxableOptionInput({
             error={fieldErrors?.[index]?.count?.message}
             onChange={(value) => updateOption(option.id, { count: value })}
             register={register(`nonTaxableOptions.${index}.count`, {
-              required: option.unitPrice > 0 ? '回数は必須です' : false,
+              // 単価が入力された場合のみ回数が必須（初期状態ではエラーを表示しない）
+              validate: (value) => {
+                // 単価が入力されていて、回数が未入力の場合のみエラー
+                if (option.unitPrice > 0 && (value === undefined || value === null || value === 0)) {
+                  return '回数は必須です';
+                }
+                return true;
+              },
               min: { value: 0, message: '回数は0以上で入力してください' },
               setValueAs: (v) => v === "" ? undefined : parseInt(v, 10),
               onChange: () => {
@@ -220,9 +235,7 @@ export function NonTaxableOptionsSection() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-
-
+              <div className="flex gap-3">
                 {/* 単価 */}
                 <NumberInput
                   id={`non-taxable-price-${option.id}`}
@@ -234,7 +247,14 @@ export function NonTaxableOptionsSection() {
                   error={(errors.nonTaxableOptions as Record<number, { unitPrice?: { message?: string } }>)?.[index]?.unitPrice?.message}
                   onChange={(value) => updateNonTaxableOption(option.id, { unitPrice: value })}
                   register={register(`nonTaxableOptions.${index}.unitPrice`, {
-                    required: option.count > 0 ? '単価は必須です' : false,
+                    // 単価は回数が入力された場合のみ必須（初期状態ではエラーを表示しない）
+                    validate: (value) => {
+                      // 回数が入力されていて、単価が未入力の場合のみエラー
+                      if (option.count > 0 && (value === undefined || value === null || value === 0)) {
+                        return '単価は必須です';
+                      }
+                      return true;
+                    },
                     min: { value: 0, message: '単価は0以上で入力してください' },
                     valueAsNumber: true,
                     onChange: () => {
@@ -250,6 +270,7 @@ export function NonTaxableOptionsSection() {
                 {/* 回数 */}
                 <NumberInput
                   id={`non-taxable-count-${option.id}`}
+                  className='max-w-[130px]'
                   value={option.count}
                   min={1}
                   step={1}
@@ -258,7 +279,14 @@ export function NonTaxableOptionsSection() {
                   error={(errors.nonTaxableOptions as Record<number, { count?: { message?: string } }>)?.[index]?.count?.message}
                   onChange={(value) => updateNonTaxableOption(option.id, { count: value })}
                   register={register(`nonTaxableOptions.${index}.count`, {
-                    required: option.unitPrice > 0 ? '回数は必須です' : false,
+                    // 単価が入力された場合のみ回数が必須（初期状態ではエラーを表示しない）
+                    validate: (value) => {
+                      // 単価が入力されていて、回数が未入力の場合のみエラー
+                      if (option.unitPrice > 0 && (value === undefined || value === null || value === 0)) {
+                        return '回数は必須です';
+                      }
+                      return true;
+                    },
                     min: { value: 1, message: '回数は1以上で入力してください' },
                     valueAsNumber: true,
                     onChange: () => {

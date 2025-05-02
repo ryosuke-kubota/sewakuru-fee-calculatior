@@ -157,14 +157,14 @@ export function TaxableOptionsSection() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex gap-3">
                 {/* 単価 */}
                 <NumberInput
                   id={`option-price-${option.id}`}
                   value={option.unitPrice}
                   min={0}
                   step={100}
-                  label="単価（税抜）"
+                  label="単価"
                   // required={true}
                   error={errors.taxableOptions?.[index]?.unitPrice?.message as string}
                   onChange={(value) => updateTaxableOption(option.id, { unitPrice: value })}
@@ -178,6 +178,7 @@ export function TaxableOptionsSection() {
                 {/* 回数 */}
                 <NumberInput
                   id={`option-count-${option.id}`}
+                  className='max-w-[130px]'
                   value={option.count}
                   min={1}
                   label="回数"

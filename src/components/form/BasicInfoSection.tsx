@@ -96,7 +96,7 @@ export function BasicInfoSection() {
         {/* 料金タイプ */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">料金タイプ</label>
-          <div className="flex space-x-4">
+          <div className="flex space-x-2">
             {(['通常', 'キャンセル50%', 'キャンセル100%'] as FeeType[]).map((type) => (
               <label key={type} className="inline-flex items-center">
                 <input
@@ -107,7 +107,7 @@ export function BasicInfoSection() {
                   value={type}
                   name="feeType"
                 />
-                <span className="ml-2 text-sm whitespace-nowrap">{type}</span>
+                <span className="ml-1 text-sm whitespace-nowrap">{type}</span>
               </label>
             ))}
           </div>
@@ -127,7 +127,7 @@ export function BasicInfoSection() {
                   value={selection}
                   name="feeSelection"
                 />
-                <span className="ml-2 text-sm whitespace-nowrap">{selection}{selection === '新料金' && ' (2025年7月〜)'}</span>
+                <span className="ml-1 text-sm whitespace-nowrap">{selection}{selection === '新料金' && ' (2025年7月〜)'}</span>
               </label>
             ))}
           </div>
@@ -147,7 +147,7 @@ export function BasicInfoSection() {
                   value={allianceOption}
                   name="alliance"
                 />
-                <span className="ml-2 text-sm whitespace-nowrap">{allianceOption}</span>
+                <span className="ml-1 text-sm whitespace-nowrap">{allianceOption}</span>
               </label>
             ))}
           </div>
@@ -167,7 +167,7 @@ export function BasicInfoSection() {
                   value={counselingOption}
                   name="counseling"
                 />
-                <span className="ml-2 text-sm whitespace-nowrap">{counselingOption}</span>
+                <span className="ml-1 text-sm whitespace-nowrap">{counselingOption}</span>
               </label>
             ))}
           </div>

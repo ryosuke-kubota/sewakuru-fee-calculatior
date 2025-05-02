@@ -77,20 +77,26 @@ export function NumberInput({
   // フォーカスが外れたときの処理
   const handleBlur = () => {
     try {
-      // 空の場合は最小値を設定
+      // 空の場合は最小値を設定（ただし、初期状態でエラーが表示されないようにする）
       if (displayValue === '' || isNaN(Number(displayValue))) {
+        // 最小値を設定
         setDisplayValue(min.toString());
         setInternalValue(min);
         onChange(min);
         
         // React Hook Formのバリデーションを即時実行するために、イベントを発火
         if (register && inputRef.current) {
-          const event = new Event('change', { bubbles: true });
-          Object.defineProperty(event, 'target', {
+          // まずフォーカスイベントを発火して、フィールドがタッチされたことを記録
+          const focusEvent = new Event('focus', { bubbles: true });
+          inputRef.current.dispatchEvent(focusEvent);
+          
+          // 次に変更イベントを発火
+          const changeEvent = new Event('change', { bubbles: true });
+          Object.defineProperty(changeEvent, 'target', {
             writable: false,
             value: { value: min.toString(), name: register.name }
           });
-          inputRef.current.dispatchEvent(event);
+          inputRef.current.dispatchEvent(changeEvent);
         }
         
         return;
@@ -112,12 +118,17 @@ export function NumberInput({
       
       // React Hook Formのバリデーションを即時実行するために、イベントを発火
       if (register && inputRef.current) {
-        const event = new Event('change', { bubbles: true });
-        Object.defineProperty(event, 'target', {
+        // まずフォーカスイベントを発火して、フィールドがタッチされたことを記録
+        const focusEvent = new Event('focus', { bubbles: true });
+        inputRef.current.dispatchEvent(focusEvent);
+        
+        // 次に変更イベントを発火
+        const changeEvent = new Event('change', { bubbles: true });
+        Object.defineProperty(changeEvent, 'target', {
           writable: false,
           value: { value: numValue.toString(), name: register.name }
         });
-        inputRef.current.dispatchEvent(event);
+        inputRef.current.dispatchEvent(changeEvent);
       }
     } catch (error) {
       // エラーが発生した場合は現在の値に戻す
