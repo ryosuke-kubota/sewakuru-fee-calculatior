@@ -161,6 +161,7 @@ export function TaxableOptionsSection() {
                 {/* 単価 */}
                 <NumberInput
                   id={`option-price-${option.id}`}
+                  className='flex-1'
                   value={option.unitPrice}
                   min={0}
                   step={100}
@@ -178,7 +179,7 @@ export function TaxableOptionsSection() {
                 {/* 回数 */}
                 <NumberInput
                   id={`option-count-${option.id}`}
-                  className='max-w-[130px]'
+                  className='w-[130px]'
                   value={option.count}
                   min={1}
                   label="回数"

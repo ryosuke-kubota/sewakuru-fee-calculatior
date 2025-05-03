@@ -52,6 +52,7 @@ function NonTaxableOptionInput({
         <div className="flex gap-3">
           <NumberInput
             id={`${registerPrefix}UnitPrice`}
+            className='flex-1'
             value={option.unitPrice}
             min={0}
             step={100}
@@ -81,7 +82,7 @@ function NonTaxableOptionInput({
           />
           <NumberInput
             id={`${registerPrefix}Count`}
-            className='max-w-[130px]'
+            className='w-[130px]'
             value={option.count}
             min={0}
             step={1}
@@ -239,6 +240,7 @@ export function NonTaxableOptionsSection() {
                 {/* 単価 */}
                 <NumberInput
                   id={`non-taxable-price-${option.id}`}
+                  className='flex-1'
                   value={option.unitPrice}
                   min={0}
                   step={100}
@@ -270,7 +272,7 @@ export function NonTaxableOptionsSection() {
                 {/* 回数 */}
                 <NumberInput
                   id={`non-taxable-count-${option.id}`}
-                  className='max-w-[130px]'
+                  className='w-[130px]'
                   value={option.count}
                   min={1}
                   step={1}
