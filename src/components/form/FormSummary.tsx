@@ -28,7 +28,7 @@ export function FormSummary() {
       <div className="max-w-md mx-auto">
         <div className="grid grid-cols-4 gap-2 text-sm">
           <div className="text-center">
-            <div className="font-medium">課税(税抜)</div>
+            <div className="font-medium">課税</div>
             <div className={colorClasses.text}>
               {formatCurrency(calculationResult.subtotalTaxExcluded)}
             </div>
