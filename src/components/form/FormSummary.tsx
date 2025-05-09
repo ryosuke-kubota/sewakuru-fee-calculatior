@@ -26,7 +26,13 @@ export function FormSummary() {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md p-3 z-0">
       <div className="max-w-md mx-auto">
-        <div className="grid grid-cols-4 gap-2 text-sm">
+        <div className="grid grid-cols-5 gap-2 text-sm">
+          <div className="text-center">
+            <div className="font-medium">CSL</div>
+            <div className={colorClasses.text}>
+              {formatCurrency(calculationResult.counselingFee)}
+            </div>
+          </div>
           <div className="text-center">
             <div className="font-medium">課税</div>
             <div className={colorClasses.text}>

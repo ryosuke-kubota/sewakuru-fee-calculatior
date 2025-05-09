@@ -1,6 +1,6 @@
 'use client';
 
-import { formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
+import { formatCurrency } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
 import { useRef, useState, useEffect, Suspense } from 'react';
 // import html2canvas from 'html2canvas';
@@ -156,7 +156,7 @@ function ReceiptContent() {
             {/* カウンセリング料金 */}
             <div className="flex justify-between text-sm">
               <span>{counseling}カウンセリング × 1回</span>
-              <span>{formatCurrency(counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE)}</span>
+              <span>{formatCurrency(calculationResult.counselingFee)}</span>
             </div>
           </div>
         </div>
@@ -217,14 +217,14 @@ function ReceiptContent() {
 
             {/* 消費税 */}
             <div className="flex justify-between">
-              <span>消費税</span>
+              <span>消費税(10%)</span>
               <span>{formatCurrency(calculationResult.tax)}</span>
             </div>
 
-            {/* 小計（税込） */}
+            {/* 課税項目小計 */}
             <div className="flex justify-between font-medium">
-              <span>小計(税込)</span>
-              <span>{formatCurrency(calculationResult.subtotalTaxIncluded)}</span>
+              <span>課税項目小計</span>
+              <span>{formatCurrency(calculationResult.subtotalTaxExcluded + calculationResult.tax)}</span>
             </div>
           </div>
         </div>
@@ -244,10 +244,10 @@ function ReceiptContent() {
               )
             ))}
 
-            {/* 非課税合計 */}
+            {/* 非課税項目小計 */}
             {calculationResult.nonTaxableTotal > 0 && (
               <div className="flex justify-between font-medium pt-1 border-t">
-                <span>非課税合計</span>
+                <span>非課税項目小計</span>
                 <span>{formatCurrency(calculationResult.nonTaxableTotal)}</span>
               </div>
             )}

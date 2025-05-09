@@ -213,13 +213,13 @@ export function ResultSection() {
 
                   {/* 消費税 */}
                   <div className="flex justify-between">
-                    <span>消費税</span>
+                    <span>消費税(10%)</span>
                     <span>{formatCurrency(calculationResult.tax)}</span>
                   </div>
 
-                  {/* 小計（税込） */}
+                  {/* 課税項目小計 */}
                   <div className="flex justify-between font-medium">
-                    <span>小計(税込)</span>
+                    <span>課税項目小計</span>
                     <span>{formatCurrency(calculationResult.subtotalTaxIncluded)}</span>
                   </div>
                 </div>
@@ -240,10 +240,10 @@ export function ResultSection() {
                     )
                   ))}
 
-                  {/* 非課税合計 */}
+                  {/* 非課税項目小計 */}
                   {calculationResult.nonTaxableTotal > 0 && (
                     <div className="flex justify-between font-medium pt-1 border-t">
-                      <span>非課税合計</span>
+                      <span>非課税項目小計</span>
                       <span>{formatCurrency(calculationResult.nonTaxableTotal)}</span>
                     </div>
                   )}

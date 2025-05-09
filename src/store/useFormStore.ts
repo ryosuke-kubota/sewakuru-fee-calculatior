@@ -102,6 +102,7 @@ export interface FormState {
   // 計算結果
   calculationResult: {
     subtotalTaxExcluded: number;
+    counselingFee: number; // カウンセリング料金を別途保持
     tax: number;
     subtotalTaxIncluded: number;
     nonTaxableTotal: number;
@@ -480,9 +481,9 @@ export const useFormStore = create<FormState & FormActions>()(
           return sum + planFee;
         }, 0);
         
-        // カウンセリング料金（無料または有料）
+        // カウンセリング料金（無料または有料）- 別途計算
         const counselingFee = state.counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE;
-        subtotalTaxExcluded += counselingFee;
+        // カウンセリング料金はsubtotalTaxExcludedに含めない
         
         // 多頭料金の計算
         // 15分延長以外のプランの合計数を計算
@@ -550,13 +551,17 @@ export const useFormStore = create<FormState & FormActions>()(
         const adjustedTax = Math.floor(Number(tax || 0) * cancelFactor);
         const adjustedNonTaxable = Math.floor(Number(nonTaxableTotal || 0) * cancelFactor);
         
-        // 合計金額の計算
-        const grandTotal = adjustedSubtotal + adjustedTax + adjustedNonTaxable;
+        // カウンセリング料金にもキャンセル係数を適用
+        const adjustedCounselingFee = Math.floor(Number(counselingFee || 0) * cancelFactor);
+        
+        // 合計金額の計算（カウンセリング料金を含める）
+        const grandTotal = adjustedSubtotal + adjustedTax + adjustedNonTaxable + adjustedCounselingFee;
         
         // 結果を設定
         set({
           calculationResult: {
             subtotalTaxExcluded: adjustedSubtotal,
+            counselingFee: adjustedCounselingFee,
             tax: adjustedTax,
             subtotalTaxIncluded: adjustedSubtotal + adjustedTax,
             nonTaxableTotal: adjustedNonTaxable,
