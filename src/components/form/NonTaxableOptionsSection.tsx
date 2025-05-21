@@ -38,8 +38,12 @@ function NonTaxableOptionInput({
   useEffect(() => {
     // 出張費の場合のみ処理
     if (option.id === 'nontaxable-transportation') {
-      // プランの回数の合計を計算
-      const totalPlanCount = plans.reduce((sum, plan) => sum + (plan.count || 0), 0);
+      // 15分延長以外のプランの回数の合計を計算
+      const totalPlanCount = plans.reduce((sum, plan) => {
+        // 15分延長プランは除外
+        if (plan.name === '15分延長') return sum;
+        return sum + (plan.count || 0);
+      }, 0);
       // 回数をプランの合計回数に合わせて更新
       updateOption(option.id, { count: totalPlanCount });
     }
