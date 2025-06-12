@@ -13,7 +13,8 @@ import {
   OLD_SEWAKURU_TRANSPORTATION_FEE,
   NEW_SEWAKURU_TRANSPORTATION_FEE,
   OLD_TOKYU_TRANSPORTATION_FEE,
-  NEW_TOKYU_TRANSPORTATION_FEE
+  NEW_TOKYU_TRANSPORTATION_FEE,
+  calculateSurchargeRate
 } from '@/utils/feeCalculator';
 
 // 料金タイプの定義
@@ -29,7 +30,7 @@ export type Alliance = 'セワクル' | '東急';
 export type Counseling = '無料' | '有料';
 
 // 割増の定義
-export type Surcharge = '時間外' | 'シーズン';
+export type Surcharge = '時間外' | 'ハイシーズン' | 'ミドルシーズン' | 'トップシーズン';
 
 // プランの定義
 export interface Plan {
@@ -455,7 +456,6 @@ export const useFormStore = create<FormState & FormActions>()(
         
         // 定数
         const TAX_RATE = 0.10;
-        const SURCHARGE_RATE = 0.20;
         const CANCEL_FACTOR = {
           '通常': 1,
           'キャンセル50%': 0.5,
@@ -471,10 +471,9 @@ export const useFormStore = create<FormState & FormActions>()(
           
           // プランごとの割増の適用
           // surchargesが存在することを確認
-          const planSurchargeCount = plan.surcharges && Array.isArray(plan.surcharges) ? plan.surcharges.length : 0;
-          if (planSurchargeCount > 0) {
-            // 割増率の計算: (1 + SURCHARGE_RATE)^n
-            const surchargeRate = Math.pow(1 + SURCHARGE_RATE, planSurchargeCount);
+          if (plan.surcharges && Array.isArray(plan.surcharges) && plan.surcharges.length > 0) {
+            // 新しい割増率計算関数を使用
+            const surchargeRate = calculateSurchargeRate(plan.surcharges);
             planFee = planFee * surchargeRate;
           }
           
@@ -505,12 +504,9 @@ export const useFormStore = create<FormState & FormActions>()(
         // surchargesが存在し、長さが0より大きいことを確認（NaN防止）
         if (state.plans.length > 0 && state.plans[0].surcharges && state.plans[0].surcharges.length > 0) {
           const firstPlan = state.plans[0];
-          const planSurchargeCount = firstPlan.surcharges.length;
-          if (planSurchargeCount > 0) {
-            // 割増率の計算: (1 + SURCHARGE_RATE)^n
-            const surchargeRate = Math.pow(1 + SURCHARGE_RATE, planSurchargeCount);
-            extensionFee = extensionFee * surchargeRate;
-          }
+          // 新しい割増率計算関数を使用
+          const surchargeRate = calculateSurchargeRate(firstPlan.surcharges);
+          extensionFee = extensionFee * surchargeRate;
         }
         
         subtotalTaxExcluded += extensionFee;

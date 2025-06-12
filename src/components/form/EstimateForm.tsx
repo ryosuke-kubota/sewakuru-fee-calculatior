@@ -23,14 +23,14 @@ const formSchema = z.object({
   feeSelection: z.enum(['旧料金', '新料金']),
   alliance: z.enum(['セワクル', '東急']),
   counseling: z.enum(['無料', '有料']),
-  surcharges: z.array(z.enum(['シーズン', '時間外'])),
+  surcharges: z.array(z.enum(['ハイシーズン', 'ミドルシーズン', 'トップシーズン', '時間外'])),
   plans: z.array(
     z.object({
       id: z.string(),
       name: z.string().min(1, 'プラン名は必須です'),
       count: z.number().min(1, '回数は1以上で入力してください'),
       unitPrice: z.number().min(0, '単価は0以上で入力してください'),
-      surcharges: z.array(z.enum(['シーズン', '時間外'])),
+      surcharges: z.array(z.enum(['ハイシーズン', 'ミドルシーズン', 'トップシーズン', '時間外'])),
     })
   ),
   multiPet: z.object({
@@ -69,13 +69,13 @@ export type FormValues = {
   feeSelection: '旧料金' | '新料金';
   alliance: 'セワクル' | '東急';
   counseling: '無料' | '有料';
-  surcharges: ('シーズン' | '時間外')[];
+  surcharges: ('ハイシーズン' | 'ミドルシーズン' | 'トップシーズン' | '時間外')[];
   plans: {
     id: string;
     name: string;
     count: number;
     unitPrice: number;
-    surcharges: ('シーズン' | '時間外')[];
+    surcharges: ('ハイシーズン' | 'ミドルシーズン' | 'トップシーズン' | '時間外')[];
   }[];
   multiPet: {
     additionalPets: number;

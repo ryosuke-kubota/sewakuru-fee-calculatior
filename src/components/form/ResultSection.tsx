@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { useFormStore } from '@/store/useFormStore';
-import { formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
+import { calculateSurchargeRate, formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
 import html2canvas from 'html2canvas';
 
@@ -165,7 +165,7 @@ export function ResultSection() {
                   {plans.map((plan) => (
                     <div key={plan.id} className="flex justify-between items-center text-sm">
                       <span>{plan.name} × {plan.count}回 {plan.surcharges.length > 0 && `(${plan.surcharges})`}</span>
-                      <span>{formatCurrency(plan.unitPrice * plan.count)}</span>
+                      <span>{formatCurrency(plan.unitPrice * plan.count * calculateSurchargeRate(plan.surcharges))}</span>
                     </div>
                   ))}
 

@@ -2,7 +2,14 @@ import { FeeType } from '@/store/useFormStore';
 
 // 定数
 export const TAX_RATE = 0.10;
-export const SURCHARGE_RATE = 0.20; // 割増率（シーズン・時間外）
+export const SURCHARGE_RATE = 0.20; // 割増率（時間外）
+
+// シーズン別割増率
+export const SEASON_SURCHARGE_RATES = {
+  'ハイシーズン': 0.10,   // 10%
+  'ミドルシーズン': 0.20, // 20%
+  'トップシーズン': 0.30, // 30%
+} as const;
 
 // キャンセル係数
 export const CANCEL_FACTOR: Record<FeeType, number> = {
@@ -42,8 +49,8 @@ export const OLD_SEWAKURU_TRANSPORTATION_FEE = 600; // セワクル出張費（�
 export const OLD_TOKYU_TRANSPORTATION_FEE = 600; // 東急出張費（旧料金）
 
 // 出張費（新料金 - 2025年7月〜）
-export const NEW_SEWAKURU_TRANSPORTATION_FEE = 800; // セワクル出張費（新料金）
-export const NEW_TOKYU_TRANSPORTATION_FEE = 1000; // 東急出張費（新料金）
+export const NEW_SEWAKURU_TRANSPORTATION_FEE = 880; // セワクル出張費（新料金）
+export const NEW_TOKYU_TRANSPORTATION_FEE = 1100; // 東急出張費（新料金）
 
 // 後方互換性のために残す
 export const SEWAKURU_TRANSPORTATION_FEE = OLD_SEWAKURU_TRANSPORTATION_FEE;
@@ -63,11 +70,22 @@ export const NEW_KEY_HANDLING_FEE = 1000;
 
 /**
  * 割増率を計算する
- * @param surchargeCount 適用される割増の数
+ * @param surcharges 適用される割増の配列
  * @returns 割増率（例: 1.2, 1.44）
  */
-export function calculateSurchargeRate(surchargeCount: number): number {
-  return Math.pow(1 + SURCHARGE_RATE, surchargeCount);
+export function calculateSurchargeRate(surcharges: string[]): number {
+  let totalRate = 1;
+  
+  for (const surcharge of surcharges) {
+    if (surcharge === '時間外') {
+      totalRate *= (1 + SURCHARGE_RATE);
+    } else if (surcharge in SEASON_SURCHARGE_RATES) {
+      const seasonRate = SEASON_SURCHARGE_RATES[surcharge as keyof typeof SEASON_SURCHARGE_RATES];
+      totalRate *= (1 + seasonRate);
+    }
+  }
+  
+  return totalRate;
 }
 
 /**

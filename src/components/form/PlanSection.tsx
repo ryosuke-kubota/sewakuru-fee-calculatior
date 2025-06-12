@@ -3,7 +3,7 @@
 import { useFormContext } from 'react-hook-form';
 import { Accordion } from '@/components/ui/Accordion';
 import { useFormStore, Surcharge } from '@/store/useFormStore';
-import { OLD_FEE_PLANS, NEW_FEE_PLANS } from '@/utils/feeCalculator';
+import { OLD_FEE_PLANS, NEW_FEE_PLANS, calculateSurchargeRate } from '@/utils/feeCalculator';
 import { formatCurrency } from '@/utils/feeCalculator';
 import { useEffect } from 'react';
 import { NumberInput } from '@/components/ui/NumberInput';
@@ -94,6 +94,26 @@ export function PlanSection() {
     }, 100);
   };
 
+  // シーズン割増の変更処理
+  const handleSeasonChange = (planId: string, season: 'ハイシーズン' | 'ミドルシーズン' | 'トップシーズン' | null) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) return;
+    
+    const newSurcharges = Array.isArray(plan.surcharges) ? [...plan.surcharges] : [];
+    
+    // 既存のシーズン割増を削除
+    const filteredSurcharges = newSurcharges.filter(s =>
+      s !== 'ハイシーズン' && s !== 'ミドルシーズン' && s !== 'トップシーズン'
+    );
+    
+    // 新しいシーズンを追加（nullでない場合）
+    if (season) {
+      filteredSurcharges.push(season);
+    }
+    
+    updatePlan(planId, { surcharges: filteredSurcharges });
+  };
+
   return (
     <Accordion title="プラン" defaultOpen={true}>
       <div className="space-y-4">
@@ -164,25 +184,63 @@ export function PlanSection() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   割増オプション
                 </label>
-                <div className="flex flex-wrap gap-2 my-2">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox h-4 w-4 text-blue-600"
-                      checked={isSurchargeSelected(plan, '時間外')}
-                      onChange={() => handleToggleSurcharge(plan.id, '時間外')}
-                    />
-                    <span className="ml-1 text-sm">時間外 (+20%)</span>
-                  </label>
-                  <label className="inline-flex items-center ml-4">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox h-4 w-4 text-blue-600"
-                      checked={isSurchargeSelected(plan, 'シーズン')}
-                      onChange={() => handleToggleSurcharge(plan.id, 'シーズン')}
-                    />
-                    <span className="ml-1 text-sm">シーズン (+20%)</span>
-                  </label>
+                <div className="space-y-2 my-2">
+                  <div className="flex flex-wrap gap-4">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox h-4 w-4 text-blue-600"
+                        checked={isSurchargeSelected(plan, '時間外')}
+                        onChange={() => handleToggleSurcharge(plan.id, '時間外')}
+                      />
+                      <span className="ml-1 text-sm">時間外 (+20%)</span>
+                    </label>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-gray-700">シーズン割増:</div>
+                    <div className="flex flex-wrap gap-4">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`season-${plan.id}`}
+                          className="form-radio h-4 w-4 text-blue-600"
+                          checked={!isSurchargeSelected(plan, 'ハイシーズン') && !isSurchargeSelected(plan, 'ミドルシーズン') && !isSurchargeSelected(plan, 'トップシーズン')}
+                          onChange={() => handleSeasonChange(plan.id, null)}
+                        />
+                        <span className="ml-1 text-sm">なし</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`season-${plan.id}`}
+                          className="form-radio h-4 w-4 text-blue-600"
+                          checked={isSurchargeSelected(plan, 'ハイシーズン')}
+                          onChange={() => handleSeasonChange(plan.id, 'ハイシーズン')}
+                        />
+                        <span className="ml-1 text-sm">ハイシーズン (+10%)</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`season-${plan.id}`}
+                          className="form-radio h-4 w-4 text-blue-600"
+                          checked={isSurchargeSelected(plan, 'ミドルシーズン')}
+                          onChange={() => handleSeasonChange(plan.id, 'ミドルシーズン')}
+                        />
+                        <span className="ml-1 text-sm">ミドルシーズン (+20%)</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`season-${plan.id}`}
+                          className="form-radio h-4 w-4 text-blue-600"
+                          checked={isSurchargeSelected(plan, 'トップシーズン')}
+                          onChange={() => handleSeasonChange(plan.id, 'トップシーズン')}
+                        />
+                        <span className="ml-1 text-sm">トップシーズン (+30%)</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -195,7 +253,7 @@ export function PlanSection() {
                         <div>基本料金: {formatCurrency(plan.unitPrice * plan.count)} (税抜)</div>
                         <div className="font-bold text-blue-600">
                           割増適用後: {formatCurrency(
-                            plan.unitPrice * plan.count * Math.pow(1.2, plan.surcharges.length)
+                            plan.unitPrice * plan.count * calculateSurchargeRate(plan.surcharges)
                           )} (税抜)
                         </div>
                       </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { formatCurrency } from '@/utils/feeCalculator';
+import { calculateSurchargeRate, formatCurrency } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
 import { useRef, useState, useEffect, Suspense } from 'react';
 // import html2canvas from 'html2canvas';
@@ -169,7 +169,7 @@ function ReceiptContent() {
             {plans.map((plan) => (
               <div key={plan.id} className="flex justify-between items-center text-sm">
                 <span>{plan.name} × {plan.count}回 {plan.surcharges.length > 0 && `(${plan.surcharges})`}</span>
-                <span>{formatCurrency(plan.unitPrice * plan.count)}</span>
+                <span>{formatCurrency(plan.unitPrice * plan.count * calculateSurchargeRate(plan.surcharges))}</span>
               </div>
             ))}
 
