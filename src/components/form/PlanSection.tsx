@@ -95,7 +95,7 @@ export function PlanSection() {
   };
 
   // シーズン割増の変更処理
-  const handleSeasonChange = (planId: string, season: 'ハイシーズン' | 'ミドルシーズン' | 'トップシーズン' | null) => {
+  const handleSeasonChange = (planId: string, season: Surcharge | null) => {
     const plan = plans.find(p => p.id === planId);
     if (!plan) return;
     
@@ -104,7 +104,7 @@ export function PlanSection() {
     // 既存のシーズン割増を削除
     const filteredSurcharges = newSurcharges.filter(s =>
       s !== 'ハイシーズン' && s !== 'ミドルシーズン' && s !== 'トップシーズン'
-    );
+    ) as Surcharge[];
     
     // 新しいシーズンを追加（nullでない場合）
     if (season) {
