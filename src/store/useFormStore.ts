@@ -27,7 +27,7 @@ export type FeeSelection = '旧料金' | '新料金';
 export type Alliance = 'セワクル' | '東急';
 
 // カウンセリングの定義
-export type Counseling = '無料' | '有料';
+export type Counseling = '無料' | '有料' | 'なし';
 
 // 割増の定義
 export type Surcharge = '時間外' | 'ハイシーズン' | 'ミドルシーズン' | 'トップシーズン';
@@ -480,8 +480,8 @@ export const useFormStore = create<FormState & FormActions>()(
           return sum + planFee;
         }, 0);
         
-        // カウンセリング料金（無料または有料）- 別途計算
-        const counselingFee = state.counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE;
+        // カウンセリング料金（無料、有料、なし）- 別途計算
+        const counselingFee = state.counseling === 'なし' ? 0 : state.counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE;
         // カウンセリング料金はsubtotalTaxExcludedに含めない
         
         // 多頭料金の計算

@@ -157,7 +157,7 @@ export function BasicInfoSection() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">カウンセリング</label>
           <div className="flex space-x-4">
-            {(['無料', '有料'] as Counseling[]).map((counselingOption) => (
+            {(['無料', '有料', 'なし'] as Counseling[]).map((counselingOption) => (
               <label key={counselingOption} className="inline-flex items-center">
                 <input
                   type="radio"

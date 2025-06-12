@@ -154,10 +154,17 @@ function ReceiptContent() {
           <h3 className={`font-bold ${colorClasses.text} mb-2`}>■カウンセリング</h3>
           <div className="space-y-1 pl-2">
             {/* カウンセリング料金 */}
-            <div className="flex justify-between text-sm">
-              <span>{counseling}カウンセリング × 1回</span>
-              <span>{formatCurrency(calculationResult.counselingFee)}</span>
-            </div>
+            {counseling === 'なし' ? (
+              <div className="flex justify-between text-sm">
+                <span>なし</span>
+                <span>{formatCurrency(0)}</span>
+              </div>
+            ) : (
+              <div className="flex justify-between text-sm">
+                <span>{counseling}カウンセリング × 1回</span>
+                <span>{formatCurrency(calculationResult.counselingFee)}</span>
+              </div>
+            )}
           </div>
         </div>
 

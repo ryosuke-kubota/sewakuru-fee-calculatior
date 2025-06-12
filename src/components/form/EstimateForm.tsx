@@ -22,7 +22,7 @@ const formSchema = z.object({
   feeType: z.enum(['通常', 'キャンセル50%', 'キャンセル100%']),
   feeSelection: z.enum(['旧料金', '新料金']),
   alliance: z.enum(['セワクル', '東急']),
-  counseling: z.enum(['無料', '有料']),
+  counseling: z.enum(['無料', '有料', 'なし']),
   surcharges: z.array(z.enum(['ハイシーズン', 'ミドルシーズン', 'トップシーズン', '時間外'])),
   plans: z.array(
     z.object({
@@ -68,7 +68,7 @@ export type FormValues = {
   feeType: '通常' | 'キャンセル50%' | 'キャンセル100%';
   feeSelection: '旧料金' | '新料金';
   alliance: 'セワクル' | '東急';
-  counseling: '無料' | '有料';
+  counseling: '無料' | '有料' | 'なし';
   surcharges: ('ハイシーズン' | 'ミドルシーズン' | 'トップシーズン' | '時間外')[];
   plans: {
     id: string;
