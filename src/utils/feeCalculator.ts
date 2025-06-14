@@ -4,11 +4,18 @@ import { FeeType } from '@/store/useFormStore';
 export const TAX_RATE = 0.10;
 export const SURCHARGE_RATE = 0.20; // 割増率（時間外）
 
-// シーズン別割増率
+// シーズン別割増率（アライアンス別）
 export const SEASON_SURCHARGE_RATES = {
-  'ハイシーズン': 0.10,   // 10%
-  'ミドルシーズン': 0.20, // 20%
-  'トップシーズン': 0.30, // 30%
+  '東急': {
+    'ハイシーズン': 0.10,   // 10%
+    'ミドルシーズン': 0.20, // 30%
+    'トップシーズン': 0.30, // 30%
+  },
+  'セワクル': {
+    'ハイシーズン': 0.20,   // 20%
+    'ミドルシーズン': 0.00, // 0% (設定なし)
+    'トップシーズン': 0.00, // 0% (設定なし)
+  }
 } as const;
 
 // キャンセル係数
@@ -71,16 +78,17 @@ export const NEW_KEY_HANDLING_FEE = 1000;
 /**
  * 割増率を計算する
  * @param surcharges 適用される割増の配列
+ * @param alliance アライアンス（東急またはセワクル）
  * @returns 割増率（例: 1.2, 1.44）
  */
-export function calculateSurchargeRate(surcharges: string[]): number {
+export function calculateSurchargeRate(surcharges: string[], alliance: '東急' | 'セワクル' = 'セワクル'): number {
   let totalRate = 1;
   
   for (const surcharge of surcharges) {
     if (surcharge === '時間外') {
       totalRate *= (1 + SURCHARGE_RATE);
-    } else if (surcharge in SEASON_SURCHARGE_RATES) {
-      const seasonRate = SEASON_SURCHARGE_RATES[surcharge as keyof typeof SEASON_SURCHARGE_RATES];
+    } else if (surcharge === 'ハイシーズン' || surcharge === 'ミドルシーズン' || surcharge === 'トップシーズン') {
+      const seasonRate = SEASON_SURCHARGE_RATES[alliance][surcharge as keyof typeof SEASON_SURCHARGE_RATES[typeof alliance]];
       totalRate *= (1 + seasonRate);
     }
   }

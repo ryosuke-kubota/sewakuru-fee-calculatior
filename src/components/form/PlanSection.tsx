@@ -21,6 +21,7 @@ export function PlanSection() {
   const {
     plans,
     feeSelection,
+    alliance,
     addPlan,
     updatePlan,
     removePlan,
@@ -28,6 +29,20 @@ export function PlanSection() {
 
   // 料金プランの選択肢を取得
   const planOptions = feeSelection === '旧料金' ? OLD_FEE_PLANS : NEW_FEE_PLANS;
+
+  // アライアンス変更時にセワくるで利用できないシーズンをクリア
+  useEffect(() => {
+    if (alliance === 'セワクル') {
+      plans.forEach(plan => {
+        if (plan.surcharges && (plan.surcharges.includes('ミドルシーズン') || plan.surcharges.includes('トップシーズン'))) {
+          const filteredSurcharges = plan.surcharges.filter(s =>
+            s !== 'ミドルシーズン' && s !== 'トップシーズン'
+          ) as Surcharge[];
+          updatePlan(plan.id, { surcharges: filteredSurcharges });
+        }
+      });
+    }
+  }, [alliance, plans, updatePlan]);
   const planNames = Object.keys(planOptions);
 
   // コンポーネントがマウントされたとき、または料金選択が変更されたときに
@@ -217,28 +232,32 @@ export function PlanSection() {
                           checked={isSurchargeSelected(plan, 'ハイシーズン')}
                           onChange={() => handleSeasonChange(plan.id, 'ハイシーズン')}
                         />
-                        <span className="ml-1 text-sm">ハイシーズン (+10%)</span>
+                        <span className="ml-1 text-sm">ハイシーズン ({alliance === '東急' ? '+10%' : '+20%'})</span>
                       </label>
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          name={`season-${plan.id}`}
-                          className="form-radio h-4 w-4 text-blue-600"
-                          checked={isSurchargeSelected(plan, 'ミドルシーズン')}
-                          onChange={() => handleSeasonChange(plan.id, 'ミドルシーズン')}
-                        />
-                        <span className="ml-1 text-sm">ミドルシーズン (+20%)</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          name={`season-${plan.id}`}
-                          className="form-radio h-4 w-4 text-blue-600"
-                          checked={isSurchargeSelected(plan, 'トップシーズン')}
-                          onChange={() => handleSeasonChange(plan.id, 'トップシーズン')}
-                        />
-                        <span className="ml-1 text-sm">トップシーズン (+30%)</span>
-                      </label>
+                      {alliance === '東急' && (
+                        <>
+                          <label className="inline-flex items-center">
+                            <input
+                              type="radio"
+                              name={`season-${plan.id}`}
+                              className="form-radio h-4 w-4 text-blue-600"
+                              checked={isSurchargeSelected(plan, 'ミドルシーズン')}
+                              onChange={() => handleSeasonChange(plan.id, 'ミドルシーズン')}
+                            />
+                            <span className="ml-1 text-sm">ミドルシーズン (+20%)</span>
+                          </label>
+                          <label className="inline-flex items-center">
+                            <input
+                              type="radio"
+                              name={`season-${plan.id}`}
+                              className="form-radio h-4 w-4 text-blue-600"
+                              checked={isSurchargeSelected(plan, 'トップシーズン')}
+                              onChange={() => handleSeasonChange(plan.id, 'トップシーズン')}
+                            />
+                            <span className="ml-1 text-sm">トップシーズン (+30%)</span>
+                          </label>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -253,7 +272,7 @@ export function PlanSection() {
                         <div>基本料金: {formatCurrency(plan.unitPrice * plan.count)} (税抜)</div>
                         <div className="font-bold text-blue-600">
                           割増適用後: {formatCurrency(
-                            plan.unitPrice * plan.count * calculateSurchargeRate(plan.surcharges)
+                            plan.unitPrice * plan.count * calculateSurchargeRate(plan.surcharges, alliance)
                           )} (税抜)
                         </div>
                       </>

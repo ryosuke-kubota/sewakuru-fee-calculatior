@@ -166,7 +166,7 @@ const getInitialState = (): FormState => ({
   feeType: '通常',
   feeSelection: '旧料金',
   alliance: 'セワクル',
-  counseling: '無料',
+  counseling: 'なし',
   surcharges: [],
 
   plans: [],
@@ -472,8 +472,8 @@ export const useFormStore = create<FormState & FormActions>()(
           // プランごとの割増の適用
           // surchargesが存在することを確認
           if (plan.surcharges && Array.isArray(plan.surcharges) && plan.surcharges.length > 0) {
-            // 新しい割増率計算関数を使用
-            const surchargeRate = calculateSurchargeRate(plan.surcharges);
+            // 新しい割増率計算関数を使用（アライアンス情報を渡す）
+            const surchargeRate = calculateSurchargeRate(plan.surcharges, state.alliance);
             planFee = planFee * surchargeRate;
           }
           
@@ -504,8 +504,8 @@ export const useFormStore = create<FormState & FormActions>()(
         // surchargesが存在し、長さが0より大きいことを確認（NaN防止）
         if (state.plans.length > 0 && state.plans[0].surcharges && state.plans[0].surcharges.length > 0) {
           const firstPlan = state.plans[0];
-          // 新しい割増率計算関数を使用
-          const surchargeRate = calculateSurchargeRate(firstPlan.surcharges);
+          // 新しい割増率計算関数を使用（アライアンス情報を渡す）
+          const surchargeRate = calculateSurchargeRate(firstPlan.surcharges, state.alliance);
           extensionFee = extensionFee * surchargeRate;
         }
         
