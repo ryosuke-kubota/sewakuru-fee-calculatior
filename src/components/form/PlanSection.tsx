@@ -109,20 +109,26 @@ export function PlanSection() {
     }, 100);
   };
 
-  // シーズン割増の変更処理
-  const handleSeasonChange = (planId: string, season: Surcharge | null) => {
+  // シーズン割増の変更処理（チェックボックス用）
+  const handleSeasonToggle = (planId: string, season: Surcharge) => {
     const plan = plans.find(p => p.id === planId);
     if (!plan) return;
     
     const newSurcharges = Array.isArray(plan.surcharges) ? [...plan.surcharges] : [];
+    const seasonSurcharges = ['ハイシーズン', 'ミドルシーズン', 'トップシーズン'] as Surcharge[];
+    
+    // 現在選択されているシーズン割増を取得
+    const currentSeasonSurcharges = newSurcharges.filter(s => seasonSurcharges.includes(s));
     
     // 既存のシーズン割増を削除
-    const filteredSurcharges = newSurcharges.filter(s =>
-      s !== 'ハイシーズン' && s !== 'ミドルシーズン' && s !== 'トップシーズン'
-    ) as Surcharge[];
+    const filteredSurcharges = newSurcharges.filter(s => !seasonSurcharges.includes(s));
     
-    // 新しいシーズンを追加（nullでない場合）
-    if (season) {
+    // 選択されたシーズンが既に選択されている場合は削除、そうでなければ追加
+    if (currentSeasonSurcharges.includes(season)) {
+      // 既に選択されている場合は削除（チェックを外す）
+      // filteredSurchargesには既にシーズン割増が除外されているのでそのまま使用
+    } else {
+      // 新しいシーズンを追加（最大1つの制限により、他のシーズンは自動的に除外される）
       filteredSurcharges.push(season);
     }
     
@@ -212,25 +218,14 @@ export function PlanSection() {
                     </label>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-700">シーズン割増:</div>
+                    <div className="text-sm font-medium text-gray-700">シーズン割増 (最大1つまで選択可能):</div>
                     <div className="flex flex-wrap gap-4">
                       <label className="inline-flex items-center">
                         <input
-                          type="radio"
-                          name={`season-${plan.id}`}
-                          className="form-radio h-4 w-4 text-blue-600"
-                          checked={!isSurchargeSelected(plan, 'ハイシーズン') && !isSurchargeSelected(plan, 'ミドルシーズン') && !isSurchargeSelected(plan, 'トップシーズン')}
-                          onChange={() => handleSeasonChange(plan.id, null)}
-                        />
-                        <span className="ml-1 text-sm">なし</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          name={`season-${plan.id}`}
-                          className="form-radio h-4 w-4 text-blue-600"
+                          type="checkbox"
+                          className="form-checkbox h-4 w-4 text-blue-600"
                           checked={isSurchargeSelected(plan, 'ハイシーズン')}
-                          onChange={() => handleSeasonChange(plan.id, 'ハイシーズン')}
+                          onChange={() => handleSeasonToggle(plan.id, 'ハイシーズン')}
                         />
                         <span className="ml-1 text-sm">ハイシーズン ({alliance === '東急' ? '+10%' : '+20%'})</span>
                       </label>
@@ -238,21 +233,19 @@ export function PlanSection() {
                         <>
                           <label className="inline-flex items-center">
                             <input
-                              type="radio"
-                              name={`season-${plan.id}`}
-                              className="form-radio h-4 w-4 text-blue-600"
+                              type="checkbox"
+                              className="form-checkbox h-4 w-4 text-blue-600"
                               checked={isSurchargeSelected(plan, 'ミドルシーズン')}
-                              onChange={() => handleSeasonChange(plan.id, 'ミドルシーズン')}
+                              onChange={() => handleSeasonToggle(plan.id, 'ミドルシーズン')}
                             />
                             <span className="ml-1 text-sm">ミドルシーズン (+20%)</span>
                           </label>
                           <label className="inline-flex items-center">
                             <input
-                              type="radio"
-                              name={`season-${plan.id}`}
-                              className="form-radio h-4 w-4 text-blue-600"
+                              type="checkbox"
+                              className="form-checkbox h-4 w-4 text-blue-600"
                               checked={isSurchargeSelected(plan, 'トップシーズン')}
-                              onChange={() => handleSeasonChange(plan.id, 'トップシーズン')}
+                              onChange={() => handleSeasonToggle(plan.id, 'トップシーズン')}
                             />
                             <span className="ml-1 text-sm">トップシーズン (+30%)</span>
                           </label>
