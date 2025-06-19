@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { useFormStore } from '@/store/useFormStore';
-import { calculateSurchargeRate, formatCurrency, FREE_COUNSELING_FEE, PAID_COUNSELING_FEE } from '@/utils/feeCalculator';
+import { calculateSurchargeRate, formatCurrency, OLD_COUNSELING_FEES, NEW_COUNSELING_FEES } from '@/utils/feeCalculator';
 import dayjs from 'dayjs';
 import html2canvas from 'html2canvas';
 
@@ -158,7 +158,11 @@ export function ResultSection() {
                   ) : (
                     <div className="flex justify-between text-sm">
                       <span>{counseling}カウンセリング × 1回</span>
-                      <span>{formatCurrency(counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE)}</span>
+                      <span>{formatCurrency(
+                        feeSelection === '旧料金' ?
+                          OLD_COUNSELING_FEES[alliance][counseling] :
+                          NEW_COUNSELING_FEES[alliance][counseling]
+                      )}</span>
                     </div>
                   )}
                 </div>

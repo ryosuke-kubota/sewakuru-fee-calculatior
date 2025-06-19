@@ -220,36 +220,37 @@ export function PlanSection() {
                   <div className="space-y-1">
                     <div className="text-sm font-medium text-gray-700">シーズン割増 (最大1つまで選択可能):</div>
                     <div className="flex flex-wrap gap-4">
+                      {alliance === '東急' && (
+                        <label className="inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                            checked={isSurchargeSelected(plan, 'ミドルシーズン')}
+                            onChange={() => handleSeasonToggle(plan.id, 'ミドルシーズン')}
+                          />
+                          <span className="ml-1 text-sm">ミドルシーズン (+10%)</span>
+                        </label>
+                      )}
+                        
                       <label className="inline-flex items-center">
                         <input
                           type="checkbox"
                           className="form-checkbox h-4 w-4 text-blue-600"
                           checked={isSurchargeSelected(plan, 'ハイシーズン')}
                           onChange={() => handleSeasonToggle(plan.id, 'ハイシーズン')}
-                        />
-                        <span className="ml-1 text-sm">ハイシーズン ({alliance === '東急' ? '+10%' : '+20%'})</span>
+                          />
+                        <span className="ml-1 text-sm">ハイシーズン (+20%)</span>
                       </label>
                       {alliance === '東急' && (
-                        <>
-                          <label className="inline-flex items-center">
-                            <input
-                              type="checkbox"
-                              className="form-checkbox h-4 w-4 text-blue-600"
-                              checked={isSurchargeSelected(plan, 'ミドルシーズン')}
-                              onChange={() => handleSeasonToggle(plan.id, 'ミドルシーズン')}
-                            />
-                            <span className="ml-1 text-sm">ミドルシーズン (+20%)</span>
-                          </label>
-                          <label className="inline-flex items-center">
-                            <input
-                              type="checkbox"
-                              className="form-checkbox h-4 w-4 text-blue-600"
-                              checked={isSurchargeSelected(plan, 'トップシーズン')}
-                              onChange={() => handleSeasonToggle(plan.id, 'トップシーズン')}
-                            />
-                            <span className="ml-1 text-sm">トップシーズン (+30%)</span>
-                          </label>
-                        </>
+                        <label className="inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                            checked={isSurchargeSelected(plan, 'トップシーズン')}
+                            onChange={() => handleSeasonToggle(plan.id, 'トップシーズン')}
+                          />
+                          <span className="ml-1 text-sm">トップシーズン (+30%)</span>
+                        </label>
                       )}
                     </div>
                   </div>

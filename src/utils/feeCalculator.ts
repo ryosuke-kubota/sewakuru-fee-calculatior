@@ -7,8 +7,8 @@ export const SURCHARGE_RATE = 0.20; // 割増率（時間外）
 // シーズン別割増率（アライアンス別）
 export const SEASON_SURCHARGE_RATES = {
   '東急': {
-    'ハイシーズン': 0.10,   // 10%
-    'ミドルシーズン': 0.20, // 30%
+    'ミドルシーズン': 0.10, // 10%
+    'ハイシーズン': 0.20,   // 20%
     'トップシーズン': 0.30, // 30%
   },
   'セワクル': {
@@ -45,7 +45,31 @@ export const NEW_FEE_PLANS = {
   '15分延長': 600,
 };
 
-// カウンセリング料金
+// カウンセリング料金（旧料金）
+export const OLD_COUNSELING_FEES = {
+  'セワクル': {
+    '無料': 1100,
+    '有料': 2200,
+  },
+  '東急': {
+    '無料': 1100,
+    '有料': 2200,
+  }
+} as const;
+
+// カウンセリング料金（新料金 - 2025年7月〜）
+export const NEW_COUNSELING_FEES = {
+  'セワクル': {
+    '無料': 1380,
+    '有料': 2480,
+  },
+  '東急': {
+    '無料': 1600,
+    '有料': 2700,
+  }
+} as const;
+
+// 後方互換性のため残す
 export const FREE_COUNSELING_FEE = 1100; // 無料カウンセリングの場合
 export const PAID_COUNSELING_FEE = 2200; // 有料カウンセリングの場合
 export const COUNSELING_FEE = 1000; // 後方互換性のため残す

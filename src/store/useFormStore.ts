@@ -8,8 +8,8 @@ import {
   NEW_ADDITIONAL_PET_FEE,
   OLD_KEY_HANDLING_FEE,
   NEW_KEY_HANDLING_FEE,
-  FREE_COUNSELING_FEE,
-  PAID_COUNSELING_FEE,
+  OLD_COUNSELING_FEES,
+  NEW_COUNSELING_FEES,
   OLD_SEWAKURU_TRANSPORTATION_FEE,
   NEW_SEWAKURU_TRANSPORTATION_FEE,
   OLD_TOKYU_TRANSPORTATION_FEE,
@@ -480,8 +480,11 @@ export const useFormStore = create<FormState & FormActions>()(
           return sum + planFee;
         }, 0);
         
-        // カウンセリング料金（無料、有料、なし）- 別途計算
-        const counselingFee = state.counseling === 'なし' ? 0 : state.counseling === '無料' ? FREE_COUNSELING_FEE : PAID_COUNSELING_FEE;
+        // カウンセリング料金（無料、有料、なし）- 別途計算（アライアンス別・料金選択別）
+        const counselingFee = state.counseling === 'なし' ? 0 :
+          state.feeSelection === '旧料金' ?
+            OLD_COUNSELING_FEES[state.alliance][state.counseling] :
+            NEW_COUNSELING_FEES[state.alliance][state.counseling];
         // カウンセリング料金はsubtotalTaxExcludedに含めない
         
         // 多頭料金の計算
