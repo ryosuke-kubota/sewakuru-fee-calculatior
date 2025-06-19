@@ -14,11 +14,12 @@ import {
   NEW_SEWAKURU_TRANSPORTATION_FEE,
   OLD_TOKYU_TRANSPORTATION_FEE,
   NEW_TOKYU_TRANSPORTATION_FEE,
-  calculateSurchargeRate
+  calculateSurchargeRate,
+  applyCancel
 } from '@/utils/feeCalculator';
 
 // 料金タイプの定義
-export type FeeType = '通常' | 'キャンセル50%' | 'キャンセル100%';
+export type FeeType = '通常' | 'キャンセル30%' | 'キャンセル50%' | 'キャンセル100%';
 
 // 料金選択の定義
 export type FeeSelection = '旧料金' | '新料金';
@@ -456,11 +457,6 @@ export const useFormStore = create<FormState & FormActions>()(
         
         // 定数
         const TAX_RATE = 0.10;
-        const CANCEL_FACTOR = {
-          '通常': 1,
-          'キャンセル50%': 0.5,
-          'キャンセル100%': 1,
-        };
         
         // 基本料金（プラン）の計算 - 各プランごとに割増を適用
         let subtotalTaxExcluded = state.plans.reduce((sum, plan) => {
@@ -544,14 +540,13 @@ export const useFormStore = create<FormState & FormActions>()(
         }, 0);
         
         // キャンセル係数の適用
-        const cancelFactor = CANCEL_FACTOR[state.feeType] || 1; // デフォルト値として1を使用
-        // NaNを防ぐために数値チェックを追加
-        const adjustedSubtotal = Math.floor(Number(subtotalTaxExcluded || 0) * cancelFactor);
-        const adjustedTax = Math.floor(Number(tax || 0) * cancelFactor);
-        const adjustedNonTaxable = Math.floor(Number(nonTaxableTotal || 0) * cancelFactor);
+        // applyCancel関数を使用してキャンセル係数を適用
+        const adjustedSubtotal = applyCancel(Number(subtotalTaxExcluded || 0), state.feeType);
+        const adjustedTax = applyCancel(Number(tax || 0), state.feeType);
+        const adjustedNonTaxable = applyCancel(Number(nonTaxableTotal || 0), state.feeType);
         
         // カウンセリング料金にもキャンセル係数を適用
-        const adjustedCounselingFee = Math.floor(Number(counselingFee || 0) * cancelFactor);
+        const adjustedCounselingFee = applyCancel(Number(counselingFee || 0), state.feeType);
         
         // 合計金額の計算（カウンセリング料金を含める）
         const grandTotal = adjustedSubtotal + adjustedTax + adjustedNonTaxable + adjustedCounselingFee;

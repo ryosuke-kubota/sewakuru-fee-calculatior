@@ -19,7 +19,7 @@ const formSchema = z.object({
   customerName: z.string().min(1, 'お客様名は必須です'),
   sitterName: z.string().min(1, '担当シッター名は必須です'),
   sittingDateTime: z.string().min(1, 'シッティング日時は必須です'),
-  feeType: z.enum(['通常', 'キャンセル50%', 'キャンセル100%']),
+  feeType: z.enum(['通常', 'キャンセル30%', 'キャンセル50%', 'キャンセル100%']),
   feeSelection: z.enum(['旧料金', '新料金']),
   alliance: z.enum(['セワクル', '東急']),
   counseling: z.enum(['無料', '有料', 'なし']),
@@ -65,7 +65,7 @@ export type FormValues = {
   customerName: string;
   sitterName: string;
   sittingDateTime: string;
-  feeType: '通常' | 'キャンセル50%' | 'キャンセル100%';
+  feeType: '通常' | 'キャンセル30%' | 'キャンセル50%' | 'キャンセル100%';
   feeSelection: '旧料金' | '新料金';
   alliance: 'セワクル' | '東急';
   counseling: '無料' | '有料' | 'なし';

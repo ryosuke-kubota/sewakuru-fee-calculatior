@@ -21,6 +21,7 @@ export const SEASON_SURCHARGE_RATES = {
 // キャンセル係数
 export const CANCEL_FACTOR: Record<FeeType, number> = {
   '通常': 1,
+  'キャンセル30%': 0.3,
   'キャンセル50%': 0.5,
   'キャンセル100%': 1, // 全額請求
 };
