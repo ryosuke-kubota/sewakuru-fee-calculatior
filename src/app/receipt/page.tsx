@@ -14,13 +14,47 @@ function ReceiptContent() {
   const [receiptData, setReceiptData] = useState<FormState | null>(null);
   
   useEffect(() => {
+    // まずlocalStorageからデータを取得を試行
+    try {
+      const storedData = localStorage.getItem('receiptData');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        setReceiptData(parsedData);
+        // データを使用後にクリーンアップ
+        localStorage.removeItem('receiptData');
+        return;
+      }
+    } catch (error) {
+      console.error('localStorageからのデータ取得に失敗:', error);
+    }
+
+    // フォールバック: URLパラメータからデータを取得
     const dataParam = searchParams.get('data');
     if (dataParam) {
       try {
-        const parsedData = JSON.parse(decodeURIComponent(dataParam));
-        setReceiptData(parsedData);
+        // まずURLパラメータをデコードを試行
+        let decodedData;
+        try {
+          decodedData = decodeURIComponent(dataParam);
+        } catch (decodeError) {
+          console.error('URLデコードエラー:', decodeError);
+          console.error('問題のあるパラメータ:', dataParam);
+          setReceiptData(null);
+          return;
+        }
+        
+        // JSONパースを試行
+        try {
+          const parsedData = JSON.parse(decodedData);
+          setReceiptData(parsedData);
+        } catch (parseError) {
+          console.error('JSONパースエラー:', parseError);
+          console.error('問題のあるデータ:', decodedData);
+          setReceiptData(null);
+        }
       } catch (error) {
-        console.error('データの解析に失敗しました:', error);
+        console.error('予期しないエラー:', error);
+        setReceiptData(null);
       }
     }
   }, [searchParams]);

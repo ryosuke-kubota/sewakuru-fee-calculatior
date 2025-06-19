@@ -96,7 +96,7 @@ export function BasicInfoSection() {
         {/* 料金タイプ */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">料金タイプ</label>
-          <div className="flex space-x-2">
+          <div className="grid grid-cols-2 gap-2">
             {(['通常', 'キャンセル30%', 'キャンセル50%', 'キャンセル100%'] as FeeType[]).map((type) => (
               <label key={type} className="inline-flex items-center">
                 <input

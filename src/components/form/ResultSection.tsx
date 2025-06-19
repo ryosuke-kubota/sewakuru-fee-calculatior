@@ -301,27 +301,38 @@ export function ResultSection() {
             >
               画像を再生成
             </button> */}
-            <a
-              href={`/receipt?data=${encodeURIComponent(JSON.stringify({
-                customerName,
-                sitterName,
-                sittingDateTime,
-                feeType,
-                feeSelection,
-                alliance,
-                counseling,
-                plans,
-                multiPet,
-                keyHandling,
-                taxableOptions,
-                nonTaxableOptions,
-                calculationResult
-              }))}`}
-              target="_blank"
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  // データをlocalStorageに保存
+                  const receiptData = {
+                    customerName,
+                    sitterName,
+                    sittingDateTime,
+                    feeType,
+                    feeSelection,
+                    alliance,
+                    counseling,
+                    plans,
+                    multiPet,
+                    keyHandling,
+                    taxableOptions,
+                    nonTaxableOptions,
+                    calculationResult
+                  };
+                  localStorage.setItem('receiptData', JSON.stringify(receiptData));
+                  // 新しいタブでレシートページを開く
+                  window.open('/receipt', '_blank');
+                } catch (error) {
+                  console.error('データの保存に失敗しました:', error);
+                  alert('データの保存に失敗しました。もう一度お試しください。');
+                }
+              }}
               className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-center"
             >
               別ページで表示
-            </a>
+            </button>
           </div>
         </div>
       ) : (
